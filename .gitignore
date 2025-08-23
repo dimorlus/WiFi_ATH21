@@ -1,3 +1,4 @@
+# Build artifacts and object files
 *.log
 *.s
 *.a
@@ -26,13 +27,14 @@
 *.pre
 *.obj
 *.lst
-*.map
 *.dcu
 *.ddp
 *.tds
 *.fts
 *.000
 *.upx
+
+# Backup and temporary files
 *.~cpp
 *.~pas
 *.~c
@@ -51,5 +53,38 @@ GLOBAL.adu
 desktop.ini
 vc_redist.*
 log.txt
+*~
+
+# Directories
 .tmp*/
 Reports/*
+build/
+build_*/
+node_modules/
+.vscode/settings.json
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Visual Studio / VS Code
+.vs/
+*.user
+*.suo
+*.vcxproj.user
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+*~
+
+# Logs and data files
+*.csv
+data/
