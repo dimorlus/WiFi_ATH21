@@ -1,0 +1,32 @@
+{
+  "project_structure": {
+    "mqtt_logger/": {
+      "src/": {
+        "main.cpp": "Основной файл программы",
+        "config.h": "Работа с конфигурацией",
+        "config.cpp": "Реализация конфигурации",
+        "logger.h": "Класс для логирования данных",
+        "logger.cpp": "Реализация логгера"
+      },
+      "CMakeLists.txt": "Файл сборки CMake",
+      ".vscode/": {
+        "tasks.json": "Задачи для сборки",
+        "launch.json": "Конфигурация отладки",
+        "c_cpp_properties.json": "Настройки IntelliSense"
+      },
+      "config.ini": "Файл конфигурации",
+      "README.md": "Инструкции по сборке"
+    }
+  },
+  "required_libraries": [
+    "PahoMQTT C++ (paho-mqtt-cpp)",
+    "SimpleIni (для работы с .ini файлами)",
+    "Regex (встроенная в C++11+)"
+  ],
+  "installation_steps": [
+    "1. Установить vcpkg для управления библиотеками",
+    "2. Установить библиотеки через vcpkg",
+    "3. Настроить CMake проект",
+    "4. Настроить VS Code для работы с проектом"
+  ]
+}

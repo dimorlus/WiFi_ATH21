@@ -1,0 +1,31 @@
+Subscribed topic: "<placeId>/<deviceId>/<custom topic>", example: "wotqbxcv2G/3PI_68C63AA0F372/CMD"
+Published topic:  "<placeId>/<deviceId>/<answer topic>", example: "wotqbxcv2G/3PI_68C63AA0F372/ANS"
+
+//Custom topics
+
+"/lwt"	//last will topic
+"/ANS"  //Publish answer
+"/CFG"  //Subscribe to Device info request. Message - hex coded u16 bitmap.
+"/INF"  //Publish WiFi info
+"/FOTA" //Subscribe to Firmware update. Message - "http://otas.3pi-solutions.com:80/RFID"
+"/TZD"  //Subscribe to time zone difference in seconds. Message - hex coded s32 value. 
+"/TZR"  //Publish time zone difference request. Message is time zone, "Asia/Jerusalem"
+"/IDRQ" //Subscribe to tag list request
+"/RFID" //Publish base64 coded tag list
+"/BZZ"  //Subscribe to Buzzer command. Message - hex coded u8 buzz number.
+
+
+//Commands list
+Subscribed topic: "wotqbxcv2G/+/CFG"
+Published topic: "wotqbxcv2G/3PI_68C63AA0F372/INF"
+Message - is two hex byte AABB 
+Bit 0..7 of AABB corresponds to one field of the follow INF string
+
+Dev: 3PI_5CCF7F06C16F;ip: 192.168.0.109;Type: RELAY;Place: N32.276543, E34.863443;
+Bld: App 1 Version 1.0.06 Mar 4 2018 08:38:46;SDK: 2.2.0(f28eaf2);Sec: 53; STS: CC;
+
+Bit 15 - OTA       
+
+Subscribed topic: "wotqbxcv2G/+/CFG"
+Message: FOTA URL
+

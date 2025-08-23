@@ -1,0 +1,3 @@
+open fota-alex
+synchronize remote -delete d:\Projects\LED\Alex\WIFI_RFID\ESP\mqtt_rfid\bin\  /home/dima/fota/RFID
+close

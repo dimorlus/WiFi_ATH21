@@ -1,0 +1,9 @@
+{
+  "cmake.generator": "MinGW Makefiles",
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "cmake.configureSettings": {
+    "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+    "VCPKG_TARGET_TRIPLET": "x64-mingw-static",
+    "VCPKG_LIBRARY_LINKAGE": "static"
+  }
+}

@@ -1,0 +1,30 @@
+c:\Qt\Tools\mingw1120_64\x86_64-w64-mingw32\lib\libwinpthread.a
+c:\vcpkg\downloads\tools\perl\5.42.0.1\c\x86_64-w64-mingw32\lib\libwinpthread.a
+
+
+cmake -S . -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake \
+  -DVCPKG_TARGET_TRIPLET=x64-linuxcmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-linux
+
+
+cmake -S . -B build -G "Unix Makefiles" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER=/usr/bin/gcc \
+  -DCMAKE_CXX_COMPILER=/usr/bin/g++
+cmake --build build -j$(nproc)
+
+cd /mnt/d/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger
+cmake -S . -B build \
+  -G "Unix Makefiles" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake \
+  -DVCPKG_TARGET_TRIPLET=x64-linux
+
+cmake --build build -j$(nproc)
+
+
+/home/dimorlus/vcpkg/installed/x64-linux/share/pahomqttcpp/PahoMqttCppConfig.cmake
+
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/vcpkg/installed/x64-linux/share/pahomqttcpp/paho-mqttpp3
+cmake --build build -j$(nproc)

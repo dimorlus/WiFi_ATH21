@@ -1,0 +1,9 @@
+c:\Qt\Tools\mingw1120_64\bin\libgcc_s_seh-1.dll
+C:\Windows\system32\kernel32.dll
+C:\Windows\system32\MSVCRT.dll
+c:\Qt\Tools\mingw1120_64\bin\libwinpthread-1.dll
+C:\Windows\system32\SHELL32.dll
+c:\Qt\Tools\mingw1120_64\bin\libstdc++-6.dll
+D:\Projects\LED\Alex\WiFi_AHT21\PC\mqtt_logger\build\libpaho-mqtt3as.dll
+D:\Projects\LED\Alex\WiFi_AHT21\PC\mqtt_logger\build\libpaho-mqttpp3.dll
+

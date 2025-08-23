@@ -1,0 +1,19 @@
+Make targets:
+
+all = make
+rebuild = clean & make
+all & rebuild => build prog. w/out bootloader
+
+all_user1 = make for user1.bin (for OTA)
+
+Prepare for OTA
+0. clean
+0. all_user1 =>build bin
+1. flashinit => cleans flash in ESP
+2. flashboot_user1 => burns bootloader
+3. flash_user1 => burns user1.bin
+
+Upload to OTA server
+4. bld => to build user1.bin & user2.bin
+5. upload both to server
+6. init OTA in ESP by mqtt command or thru webserver on ESP 

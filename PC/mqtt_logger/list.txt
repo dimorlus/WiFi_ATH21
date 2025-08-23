@@ -1,0 +1,24 @@
+.cache\
+.vscode\
+	c_cpp_properties.json
+	launch.json
+	tasks.json
+build\
+src\
+	config.cpp
+	config.h
+	logger.cpp
+	logger.h
+	main.cpp
+Build.bat
+CMakeLists.txt
+CMakeLists_first.txt
+config.ini
+dlls.txt
+fix_instructions.md
+fixlib.cmd
+install_dependencies.bat
+Makefile
+readme.md
+vscode_project.json
+

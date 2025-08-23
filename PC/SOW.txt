@@ -1,0 +1,86 @@
+Есть устройство на ESP8266 которое подключается к MQTT брокеру и посылает такие данные:
+
+ORLOV/HUMT/HT_3C71BF29A68E/HUMT:SNTP: 1755580662, TEMP: 26.4 C, HUM: 56.3 %, DEW: 17.0 C
+
+Я хочу написать программу на C/С++ (две программы) для Windows и Linux, которая бы подключалась к 
+MQTT брокеру, подписывалась на все топики вида ORLOV/HUMT/HT_3C71BF29A68E/HUMT 
+(HT_3C71BF29A68E - для каждого устройства уникален, это его MAC) получало данные и записывало 
+их в текстовый файл с именем, совпадающем с именем устройства и расширением .csv в соответствии
+с заданным регулярным выражением Search и Replace. Первой строкой должен идти Header. Настройки 
+программы должны храниться в .ini файле, совпадающем по имени с именем программы (где его помещать 
+для Windows и Linux - отдельный вопрос).  
+
+[MQTT]
+URL=dorlov.no-ip.com:1883
+user=dimorlus
+passwd=dorlov
+topic_base=ORLOV
+
+[DATA]
+Header = SNTP; TEMP; HUM
+Search = "SNTP: ([0-9]+), TEMP: ([0-9\.]+) C, HUM: ([0-9\.]+) %, DEW: ([0-9\.]+) C"
+Replace = "\1;\2;\3
+
+[LOG]
+;Folder="%APPDATA%\mqtt_Logger\data"
+Folder="d:\Projects\LED\Alex\WiFi_AHT21\PC\LOG"
+
+
+Разрабатывать и проверять я сначала хочу под Windows в среде Visual Studio Code.
+У меня установлен c:\Qt\Tools\mingw1120_64\bin\g++.exe 
+Я хочу, чтобы ты помог создать проект в VS code, создал необходимые программные файлы, 
+указал какие надо скачать и установить библиотеки. Раньше я пользовался 
+eclipse-paho-mqtt-c-src-1.2.0, скомпилированной в dll и Cbuilder6, но это было 7 лет назад.
+
+Дополнительно. 
+
+Нужно сделать так, чтобы в секции [DATA] можно было использовать макрос $DEV, который бы принмал 
+значение  HT_3C71BF29A68E (переменная часть топика ORLOV/HUMT/HT_3C71BF29A68E/HUMT). Тогда
+в .ini файле можно было бы писать 
+
+[DATA]
+Header = DEV; SNTP; TEMP; HUM
+Search = "SNTP: ([0-9]+), TEMP: ([0-9\.]+) C, HUM: ([0-9\.]+) %, DEW: ([0-9\.]+) C"
+Replace = "$DEV;\1;\2;\3
+
+Еще я бы хотел для строки Replace макрос $DateTime('dd/MM/yyyy hh:mm:ss', SNTP)
+Year: yyyy (four digits), yy (two digits)
+Month: MM (two digits, e.g., 01), M (one or two digits, e.g., 1), MMM (short month 
+	name, e.g., Jan), MMMM (full month name, e.g., January)
+Day: dd (two digits, e.g., 01), d (one or two digits, e.g., 1), ddd (short day name, e.g., Mon), 
+	dddd (full day name, e.g., Monday)
+Hour: hh (12-hour format with leading zero), h (12-hour format), HH (24-hour format with leading zero), 
+	H (24-hour format)
+Minute: mm (with leading zero), m (without leading zero)
+Second: ss (with leading zero), s (without leading zero)
+Millisecond: zzz (with leading zeros), z (without leading zeros)
+AM/PM indicator: AM/PM or am/pm
+Literal characters: Enclose any literal characters you want to appear in the output within single 
+	quotes (e.g., 'at').
+
+Если это возможно, макрос (функция) должна переводить timestamp UTC в локальное время (в соответствии с тем, что есть 
+в компьютере, на котором запущена программа). 
+
+
+
+Я хочу еще расширить функционал. Добавить в ini файл секцию
+[NAME]
+HT_3C71BF29A68E = "Vica office"
+HT_3C71BF29A837 = "Lab"
+HT_3C71BF29AB79 = "Clean room"
+HT_3C71BF28FBD8 = "Dima office"
+
+И макрос $NAME, который бы заменялся на имя для найденного $DEV, или на $DEV, если ничего не найдено.
+
+В секцию [LOG] допавить параметр Name, который бы задавал имя log файла 
+
+[LOG]
+;Folder="%APPDATA%\mqtt_Logger\data"
+Folder="d:\Projects\LED\Alex\WiFi_AHT21\PC\LOG"
+Name=$NAME
+
+Может быть задано $NAME, или $DEV, или любое другое имя, например Logfile, или ничего. Если имя не задано, 
+то оно, по умолчанию, $DEV (как было). Если задано, и оно не зависит от $DEV, то все пишется в один файл, ну
+и если содержит $DEV или $NAME, то эти макросы раскрываются. Возможно, в будущем, я захочу добавить туда
+$TIME{'yy MMM'), которое раскрывалось бы в текущую дату/время (надо будет к формату добавить ww - номер 
+недели в году, чтобы можно было делать месячные, годовые, недельные и т. п. логи. 

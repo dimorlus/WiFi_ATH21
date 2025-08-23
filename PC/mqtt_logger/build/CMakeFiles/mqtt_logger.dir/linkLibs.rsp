@@ -1,0 +1,1 @@
+ "C:/vcpkg/installed/x64-mingw-static/lib/libpaho-mqttpp3-static.a" "C:/vcpkg/installed/x64-mingw-static/lib/libpaho-mqtt3as-static.a" "C:/vcpkg/installed/x64-mingw-static/lib/libssl.a" "C:/vcpkg/installed/x64-mingw-static/lib/libcrypto.a" -lws2_32 -lcrypt32 -lrpcrt4 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

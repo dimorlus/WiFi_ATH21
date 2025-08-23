@@ -1,0 +1,1 @@
+"c:\program files\winrar\rar" u ..\backup\wifi_aht21 -r -ver -x.git\*.* -x.tmp.drivedownload\*.* -x@.gitignore -xDatasheets\*.* -ed
