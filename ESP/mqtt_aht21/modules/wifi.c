@@ -125,6 +125,9 @@ void ICACHE_FLASH_ATTR setup_wifi_ap_mode(void)
         apconfig.ssid_hidden = 0;
         apconfig.channel = 7;
         apconfig.max_connection = 10;
+
+        apconfig.beacon_interval = 1000;  // 1000 ms for lower power
+
         if(!wifi_softap_set_config(&apconfig))
          {
           INFO("GW not set AP config!\r\n");

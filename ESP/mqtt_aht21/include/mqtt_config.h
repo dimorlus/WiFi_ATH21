@@ -31,6 +31,7 @@ typedef enum{
 #define MQTT_USER           "dimorlus"
 #define MQTT_PASS           "dorlov"
 #define STA_SSID            "HONOR"
+//#define STA_SSID            "HOME_IOT"
 #define STA_PASS            "AAAAABBBBB"
 #define PLACE               "LAB"
 #define MQTT_CLIENT_ID      "HT_%02X%02X%02X%02X%02X%02X" //"DVES_%08X"
