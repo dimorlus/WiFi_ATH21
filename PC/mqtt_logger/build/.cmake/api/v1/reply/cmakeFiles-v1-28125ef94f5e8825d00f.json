@@ -1,0 +1,281 @@
+{
+	"inputs" : 
+	[
+		{
+			"path" : "CMakeLists.txt"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.27.6/CMakeSystem.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeDependentOption.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-Initialize.cmake"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.27.6/CMakeCXXCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeGenericSystem.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/WindowsPaths.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeCXXInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Compiler/GNU-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Compiler/GNU.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-GNU.cmake"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.27.6/CMakeRCCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeRCInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-windres.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Platform/Windows-GNU-CXX-ABI.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/pahomqttcpp/PahoMqttCppConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/pahomqttcpp/PahoMqttCppConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindThreads.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CheckLibraryExists.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CheckIncludeFileCXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CheckCXXSourceCompiles.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/Internal/CheckSourceCompiles.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/eclipse-paho-mqtt-c/eclipse-paho-mqtt-cConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/eclipse-paho-mqtt-c/eclipse-paho-mqtt-cConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/openssl/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindOpenSSL.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/eclipse-paho-mqtt-c/eclipse-paho-mqtt-cConfig-debug.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/eclipse-paho-mqtt-c/eclipse-paho-mqtt-cConfig-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/openssl/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindOpenSSL.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/pahomqttcpp/PahoMqttCppTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/pahomqttcpp/PahoMqttCppTargets-debug.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/pahomqttcpp/PahoMqttCppTargets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/eclipse-paho-mqtt-c/eclipse-paho-mqtt-cConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/eclipse-paho-mqtt-c/eclipse-paho-mqtt-cConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "C:/vcpkg/installed/x64-mingw-static/share/openssl/vcpkg-cmake-wrapper.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindOpenSSL.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.27/Modules/FindPackageMessage.cmake"
+		}
+	],
+	"kind" : "cmakeFiles",
+	"paths" : 
+	{
+		"build" : "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build",
+		"source" : "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger"
+	},
+	"version" : 
+	{
+		"major" : 1,
+		"minor" : 0
+	}
+}

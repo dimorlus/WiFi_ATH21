@@ -1,0 +1,10 @@
+^D:\PROJECTS\LED\ALEX\WIFI_AHT21\PC\HTVIEW\HT_VIEW\BUILD\CMAKEFILES\DD2F0DE88FDDE78554936308AE40803C\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view -BD:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/HT_view.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

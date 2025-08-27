@@ -1,0 +1,22 @@
+# /etc/systemd/system/mqtt_logger.service
+[Unit]
+Description=MQTT logger service
+After=network.target
+
+[Service]
+Type=simple
+User=mqttlogger
+Group=mqttlogger
+WorkingDirectory=/opt/mqtt_logger
+ExecStart=/opt/mqtt_logger/mqtt_logger
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=5
+StartLimitIntervalSec=60
+# лог в journald (удобно смотреть через journalctl)
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
