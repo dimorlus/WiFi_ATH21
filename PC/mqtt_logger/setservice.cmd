@@ -1,11 +1,11 @@
 @echo off
 REM run as Administrator
-set NSSM="D:\Tools\nssm\nssm.exe"
-set EXE="D:\Projects\LED\Alex\WiFi_AHT21\PC\mqtt_logger\build\mqtt_logger.exe"
+set NSSM="c:\mqtt_logger\nssm.exe"
+set EXE="c:\mqtt_logger\mqtt_logger.exe"
 set SRVNAME=mqtt_logger
-set APPDIR="D:\Projects\LED\Alex\WiFi_AHT21\PC\mqtt_logger\build"
-set OUTLOG="D:\Projects\LED\Alex\WiFi_AHT21\PC\mqtt_logger\logs\stdout.log"
-set ERRLOG="D:\Projects\LED\Alex\WiFi_AHT21\PC\mqtt_logger\logs\stderr.log"
+set APPDIR="c:\mqtt_logger"
+set OUTLOG="c:\mqtt_logger\logs\stdout.log"
+set ERRLOG="c:\mqtt_logger\logs\stderr.log"
 
 REM create logs dir
 if not exist "%~dp0logs" mkdir "%~dp0logs"
@@ -19,4 +19,6 @@ if not exist "%~dp0logs" mkdir "%~dp0logs"
 
 echo Service %SRVNAME% installed. Start it with:
 echo     "%NSSM%" start %SRVNAME%
+pause
+c:\mqtt_logger\nssm.exe start mqtt_logger
 pause

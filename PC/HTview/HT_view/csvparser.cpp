@@ -1,7 +1,19 @@
 #include "csvparser.h"
 #include <QFile>
 #include <QTextStream>
+#include <QDateTime>
 #include <QDebug>
+#include <QRegularExpression>
+
+// === МАКРОС ДЛЯ ОТЛАДКИ ===
+#define DEBUG_MODE 0  // 1 = включить отладку, 0 = отключить
+
+#if DEBUG_MODE
+    #define DEBUG_LOG(x) (qDebug() << x)
+#else
+    #define DEBUG_LOG(x) ((void)0)
+#endif
+// === КОНЕЦ МАКРОСА ===
 
 CSVParser::CSVParser() {
     // По умолчанию: timestamp;temp;humidity
@@ -9,14 +21,15 @@ CSVParser::CSVParser() {
 }
 
 void CSVParser::setPattern(const QString& pattern) {
-    parsePattern = pattern;
-    buildRegexFromPattern();
+    // УБРАТЬ: m_pattern = pattern;
+    parsePattern = pattern;  // используем существующую переменную
+    DEBUG_LOG("Pattern set to:" << pattern);
 }
 
 void CSVParser::buildRegexFromPattern() {
     // Оставляем для совместимости, но не используем
     parseRegex.setPattern(".*");
-    qDebug() << "Pattern set to:" << parsePattern;
+    DEBUG_LOG("Pattern set to:" << parsePattern);  // ЗАМЕНИТЬ qDebug на DEBUG_LOG
 }
 
 QDateTime CSVParser::parseTimestamp(const QString& value, bool isUnixTime) {
@@ -67,7 +80,7 @@ QVector<DataPoint> CSVParser::parseFile(const QString& filePath) {
     
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Cannot open file:" << filePath;
+        DEBUG_LOG("Cannot open file:" << filePath);  // ЗАМЕНИТЬ qDebug на DEBUG_LOG
         return results;
     }
     
@@ -111,6 +124,6 @@ QVector<DataPoint> CSVParser::parseFile(const QString& filePath) {
         results.append(point);
     }
     
-    qDebug() << "Parsed" << results.size() << "data points";
+    DEBUG_LOG("Parsed" << results.size() << "data points");
     return results;
 }

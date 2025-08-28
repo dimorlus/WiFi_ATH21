@@ -88,7 +88,8 @@ private:
     // Новые члены для навигации
     enum TimeScale { Day, Week, Month };
     TimeScale currentTimeScale;
-    QVector<DataPoint> originalData; // Сохраняем оригинальные данные
+    QVector<DataPoint> originalData;
+    QVector<DataPoint> rawData;      // ДОБАВИТЬ: исходные несглаженные данные
     QCPItemLine *crossHairV; // Вертикальная линия курсора
     QCPItemLine *crossHairH; // Горизонтальная линия курсора
     QCPItemText *valueLabel; // Подпись с значениями
@@ -96,6 +97,9 @@ private:
     
     // Состояние печати
     QAction *blackWhitePrintAction;  // ДОБАВИТЬ
+    
+    // Режимы отображения  
+    bool showPointsMode = false;     // ДОБАВИТЬ: false = линии, true = точки
     
     // Методы
     void setupUI();
@@ -126,6 +130,39 @@ private:
     void updateStatusStats();
     
     void renderChartToPrinter(QPrinter *printer, bool useColor = true);  // ДОБАВЛЕН параметр useColor
+    
+    void toggleDisplayMode();              // метод переключения
+
+private:
+    // ДОБАВИТЬ: настройки визуализации
+    struct VisualizationSettings {
+        // Цвета
+        QColor temperatureColor = Qt::red;
+        QColor humidityColor = Qt::blue;
+        QColor gridColor = Qt::lightGray;
+        QColor crosshairColor = Qt::darkGray;
+        
+        // Толщина линий
+        int temperatureLineWidth = 2;
+        int humidityLineWidth = 2;
+        int gridLineWidth = 1;
+        int crosshairLineWidth = 1;
+        
+        // Параметры сглаживания
+        int smoothingWindow = 5;
+        bool enableSmoothing = true;
+        
+        // Размеры точек
+        int pointSize = 4;
+        
+        // Прозрачность
+        int gridOpacity = 255;      // 0-255
+        int crosshairOpacity = 200; // 0-255
+    } vizSettings;
+    
+    void loadVisualizationSettings(QSettings& settings);
+    void loadDefaultVisualizationSettings();
+    void applyVisualizationSettings();
 };
 
 #endif // MAINWINDOW_H

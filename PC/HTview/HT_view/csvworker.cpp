@@ -4,6 +4,16 @@
 #include <QCoreApplication>
 #include <QDebug>
 
+// === МАКРОС ДЛЯ ОТЛАДКИ ===
+#define DEBUG_MODE 0  // 1 = включить отладку, 0 = отключить
+
+#if DEBUG_MODE
+    #define DEBUG_LOG(x) (qDebug() << x)
+#else
+    #define DEBUG_LOG(x) ((void)0)
+#endif
+// === КОНЕЦ МАКРОСА ===
+
 CSVWorker::CSVWorker(QObject *parent) : QObject(parent)
 {
 }
@@ -96,6 +106,6 @@ void CSVWorker::parseFile()
     emit statusChanged("Parsing complete");
     emit progressChanged(60);
     
-    qDebug() << "Fast parsed" << results.size() << "data points from" << fileData.size() << "bytes";
+    DEBUG_LOG("Fast parsed" << results.size() << "data points from" << fileData.size() << "bytes");
     emit finished(results);
 }

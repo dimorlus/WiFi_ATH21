@@ -129,33 +129,71 @@ HT View is a powerful desktop application for visualizing and analyzing temperat
 - **💾 Export** - Quick export menu
 - **🖨️ Print** - Print current view
 
+#### Display Controls
+
+- **P Key** - Toggle between Lines and Points display modes
+  - **Lines Mode** - Smooth connected lines (default)
+  - **Points Mode** - Individual data points without smoothing
+- **T Key** - Show/hide Temperature graph
+- **H Key** - Show/hide Humidity graph
+
+#### Navigation Controls
+
+- **Arrow Keys** - Navigate and zoom
+  - **Left/Right** - Move timeline forward/backward
+  - **Shift+Left/Right** - Smooth horizontal panning
+  - **Up/Down** - Pan graphs vertically
+  - **Shift+Up/Down** - Zoom in/out vertically
+- **Time Scale** - Switch between different time ranges
+  - **D** - Day view (24 hours)
+  - **W** - Week view (7 days)  
+  - **M** - Month view (30 days)
+- **Quick Navigation**
+  - **Home** - Jump to start of data
+  - **End** - Jump to end of data
+  - **Shift+Home** - Reset all zoom to fit data
+  - **PgUp/PgDn** - Jump to period boundaries (day/week/month edges)
+
 #### Mouse Controls
 
-- **Scroll Wheel** - Zoom in/out
-- **Left Click + Drag** - Pan chart
-- **Right Click** - Context menu
-- **Double Click** - Reset zoom
+- **Mouse Wheel** - Zoom time axis in/out
+- **Left Click + Drag** - Pan chart horizontally
+- **Shift + Mouse Move** - Show crosshair with precise values
+- **Right Click** - Context menu (future feature)
 
 #### Keyboard Shortcuts
 
-| Key      | Action          |
-| -------- | --------------- |
-| `Ctrl+O` | Open file       |
-| `Ctrl+P` | Print           |
-| `F5`     | Refresh         |
-| `D`      | Day view        |
-| `W`      | Week view       |
-| `M`      | Month view      |
-| `Ctrl++` | Zoom in         |
-| `Ctrl+-` | Zoom out        |
-| `Ctrl+0` | Reset zoom      |
-| `Esc`    | Exit fullscreen |
+| Key           | Action                           |
+| ------------- | -------------------------------- |
+| `Ctrl+O`      | Open file                        |
+| `Ctrl+P`      | Print                           |
+| `Ctrl+E`      | Export chart                    |
+| `F5`          | Refresh                         |
+| **Navigation** |                                |
+| `D`           | Day view                        |
+| `W`           | Week view                       |
+| `M`           | Month view                      |
+| `Left/Right`  | Navigate timeline               |
+| `Shift+Left/Right` | Smooth pan horizontally    |
+| `Up/Down`     | Pan graphs vertically           |
+| `Shift+Up/Down` | Zoom in/out vertically        |
+| `Home`        | Go to start of data             |
+| `End`         | Go to end of data               |
+| `Shift+Home`  | Reset all zoom                  |
+| `PgUp/PgDn`   | Jump to period boundaries       |
+| **Display**   |                                |
+| `P`           | Toggle Points/Lines mode        |
+| `T`           | Toggle Temperature graph        |
+| `H`           | Toggle Humidity graph           |
+| **Mouse**     |                                |
+| `Shift+Mouse` | Show crosshair with values      |
+| `Mouse Wheel` | Zoom time axis                  |
 
 ## Configuration
 
 ### config.ini File
 
-The application uses a configuration file `config.ini` located in the same directory as the executable. This file stores CSV parsing settings and data format configurations.
+The application uses a configuration file `config.ini` located in the same directory as the executable. This file stores CSV parsing settings, data format configurations, and visualization preferences.
 
 #### File Location
 
@@ -178,101 +216,130 @@ TimestampPattern=%d;%f;%f
 
 ; Active parsing pattern (DateTime or Timestamp)
 ActivePattern=DateTime
+
+[VISUALIZATION]
+; Chart appearance and behavior settings
+
+; Colors (in #RRGGBB format)
+TemperatureColor=#FF0000
+HumidityColor=#0000FF
+GridColor=#D3D3D3
+CrosshairColor=#A9A9A9
+
+; Line thickness (in pixels)
+TemperatureLineWidth=2
+HumidityLineWidth=2
+GridLineWidth=1
+CrosshairLineWidth=1
+
+; Data smoothing settings
+SmoothingWindow=5
+EnableSmoothing=true
+
+; Point size for Points display mode
+PointSize=4
+
+; Transparency (0-255, where 255 is fully opaque)
+GridOpacity=255
+CrosshairOpacity=200
 ```
 
-#### Format Patterns Explained
+#### Visualization Settings Explained
 
-**Pattern Symbols:**
+**Colors:**
+- Use standard HTML color codes (#RRGGBB format)
+- Examples: `#FF0000` (red), `#0000FF` (blue), `#00FF00` (green)
+- Online color picker tools can help choose custom colors
 
-- `%f` = Floating point number (temperature/humidity values)
-- `%d` = Integer (Unix timestamp)
-- `%s` = String (status or additional text)
+**Line Thickness:**
+- Values in pixels (1-10 recommended)
+- Thicker lines are more visible but may overlap
+- Use 1 for grid lines, 2-3 for data lines
 
-**DateTime Format:**
+**Data Smoothing:**
+- `SmoothingWindow`: Number of points to average (1-20)
+  - Higher values = smoother lines, less detail
+  - Lower values = more detail, less smoothing
+  - Set to 0 or 1 to disable smoothing
+- `EnableSmoothing`: `true` or `false`
+  - Controls whether smoothing is applied at all
+  - When `false`, raw data is always used
 
-- `ddd` = Abbreviated day name (Mon, Tue, Wed...)
-- `MMM` = Abbreviated month name (Jan, Feb, Mar...)
-- `dd` = Day of month (01-31)
-- `yyyy` = 4-digit year (2024)
-- `HH:mm` = 24-hour time (12:30)
+**Point Size:**
+- Size of points in Points display mode (1-10 pixels)
+- Larger values make points more visible
+- Smaller values for dense data
 
-#### Supported CSV Formats
+**Transparency:**
+- Values from 0 (invisible) to 255 (fully opaque)
+- Lower values make elements more subtle
+- Higher values make elements more prominent
 
-**Format 1: DateTime with Status**
+#### Example Configurations
 
-```csv
-DateTime('Mon, Jan 01 2024 08:00');22.1;68.5;OK
-DateTime('Mon, Jan 01 2024 08:30');22.3;68.2;OK
-DateTime('Mon, Jan 01 2024 09:00');22.8;67.8;OK
-```
-
-**Format 2: Unix Timestamp**
-
-```csv
-1704088800;22.1;68.5
-1704090600;22.3;68.2
-1704092400;22.8;67.8
-```
-
-#### Customizing CSV Parsing
-
-**For Tab-Separated Values:**
-
+**High Contrast Theme:**
 ```ini
-[PARSER]
-DateTimePattern=DateTime('ddd, MMM dd yyyy HH:mm')\t%f\t%f\t%s
-TimestampPattern=%d\t%f\t%f
-ActivePattern=DateTime
+[VISUALIZATION]
+TemperatureColor=#FF0000
+HumidityColor=#0000FF
+GridColor=#808080
+CrosshairColor=#000000
+TemperatureLineWidth=3
+HumidityLineWidth=3
+GridLineWidth=1
+CrosshairLineWidth=2
+SmoothingWindow=1
+EnableSmoothing=false
+PointSize=6
+GridOpacity=128
+CrosshairOpacity=255
 ```
 
-**For Different DateTime Format:**
-
+**Subtle/Minimal Theme:**
 ```ini
-[PARSER]
-; For format: "2024-01-01 08:00:00;22.1;68.5"
-DateTimePattern=yyyy-MM-dd HH:mm:ss;%f;%f
-ActivePattern=DateTime
+[VISUALIZATION]
+TemperatureColor=#FF6B6B
+HumidityColor=#4ECDC4
+GridColor=#F0F0F0
+CrosshairColor=#CCCCCC
+TemperatureLineWidth=1
+HumidityLineWidth=1
+GridLineWidth=1
+CrosshairLineWidth=1
+SmoothingWindow=10
+EnableSmoothing=true
+PointSize=2
+GridOpacity=100
+CrosshairOpacity=150
 ```
 
-**For Different Column Order:**
-
+**No Smoothing (Raw Data):**
 ```ini
-[PARSER]
-; For format: "22.1;68.5;DateTime('Mon, Jan 01 2024 08:00')"
-DateTimePattern=%f;%f;DateTime('ddd, MMM dd yyyy HH:mm')
-ActivePattern=DateTime
+[VISUALIZATION]
+TemperatureColor=#FF0000
+HumidityColor=#0000FF
+GridColor=#D3D3D3
+CrosshairColor=#A9A9A9
+TemperatureLineWidth=2
+HumidityLineWidth=2
+GridLineWidth=1
+CrosshairLineWidth=1
+SmoothingWindow=0
+EnableSmoothing=false
+PointSize=4
+GridOpacity=255
+CrosshairOpacity=200
 ```
 
-#### Switching Between Formats
+#### Applying Configuration Changes
 
-To switch between DateTime and Unix timestamp formats:
-
-1. Open `config.ini` in any text editor
-2. Change `ActivePattern=DateTime` to `ActivePattern=Timestamp` (or vice versa)
+1. Close HT View application
+2. Edit `config.ini` with any text editor
 3. Save the file
-4. Restart HT View or press F5 to reload
+4. Restart HT View
+5. Changes will be applied automatically
 
-#### Application Settings (Auto-Generated)
-
-The application may also create additional sections for user preferences:
-
-```ini
-[Window]
-# Window size and position (auto-saved)
-Width=1200
-Height=800
-X=100
-Y=100
-Maximized=false
-
-[Recent]
-# Recently opened files (auto-managed)
-File1=C:\Data\sensor_2024.csv
-File2=C:\Data\temperature_log.csv
-MaxRecentFiles=10
-```
-
-These sections are automatically managed by the application and don't require manual editing.
+**Note:** Invalid color codes or values will revert to defaults.
 
 ## CSV File Format
 
