@@ -103,6 +103,16 @@ build CMakeFiles\HT_view.dir\csvworker.cpp.obj: CXX_COMPILER__HT_view_Release D$
   TARGET_COMPILE_PDB = CMakeFiles\HT_view.dir\
   TARGET_PDB = HT_view.pdb
 
+build CMakeFiles\HT_view.dir\app.rc.res: RC_COMPILER__HT_view_Release D$:\Projects\LED\Alex\WiFi_AHT21\PC\HTview\HT_view\app.rc || cmake_object_order_depends_target_HT_view
+  DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
+  DEP_FILE = CMakeFiles\HT_view.dir\app.rc.res.d
+  FLAGS = -DWIN32
+  INCLUDES = -I D:\Projects\LED\Alex\WiFi_AHT21\PC\HTview\build-HT_view-MSVC2022-Release\HT_view_autogen\include -I C:\Qt\6.6.0\msvc2019_64\include\QtCore -I C:\Qt\6.6.0\msvc2019_64\include -I C:\Qt\6.6.0\msvc2019_64\mkspecs\win32-msvc -I C:\Qt\6.6.0\msvc2019_64\include\QtWidgets -I C:\Qt\6.6.0\msvc2019_64\include\QtGui -I C:\VulkanSDK\1.4.304.1\Include -I C:\Qt\6.6.0\msvc2019_64\include\QtPrintSupport
+  OBJECT_DIR = CMakeFiles\HT_view.dir
+  OBJECT_FILE_DIR = CMakeFiles\HT_view.dir
+  TARGET_COMPILE_PDB = CMakeFiles\HT_view.dir\
+  TARGET_PDB = HT_view.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target HT_view
@@ -111,7 +121,7 @@ build CMakeFiles\HT_view.dir\csvworker.cpp.obj: CXX_COMPILER__HT_view_Release D$
 #############################################
 # Link the executable HT_view.exe
 
-build HT_view.exe: CXX_EXECUTABLE_LINKER__HT_view_Release CMakeFiles\HT_view.dir\HT_view_autogen\mocs_compilation.cpp.obj CMakeFiles\HT_view.dir\main.cpp.obj CMakeFiles\HT_view.dir\mainwindow.cpp.obj CMakeFiles\HT_view.dir\qcustomplot.cpp.obj CMakeFiles\HT_view.dir\csvparser.cpp.obj CMakeFiles\HT_view.dir\csvworker.cpp.obj | C$:\Qt\6.6.0\msvc2019_64\lib\Qt6PrintSupport.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Widgets.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Gui.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Core.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6EntryPoint.lib || HT_view_autogen HT_view_autogen_timestamp_deps
+build HT_view.exe: CXX_EXECUTABLE_LINKER__HT_view_Release CMakeFiles\HT_view.dir\HT_view_autogen\mocs_compilation.cpp.obj CMakeFiles\HT_view.dir\main.cpp.obj CMakeFiles\HT_view.dir\mainwindow.cpp.obj CMakeFiles\HT_view.dir\qcustomplot.cpp.obj CMakeFiles\HT_view.dir\csvparser.cpp.obj CMakeFiles\HT_view.dir\csvworker.cpp.obj CMakeFiles\HT_view.dir\app.rc.res | C$:\Qt\6.6.0\msvc2019_64\lib\Qt6PrintSupport.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Widgets.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Gui.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Core.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6EntryPoint.lib || HT_view_autogen HT_view_autogen_timestamp_deps
   FLAGS = /DWIN32 /D_WINDOWS /GR /EHsc /O2 /Ob2 /DNDEBUG -MD
   LINK_FLAGS = /machine:x64 /INCREMENTAL:NO /subsystem:windows
   LINK_LIBRARIES = C:\Qt\6.6.0\msvc2019_64\lib\Qt6PrintSupport.lib  C:\Qt\6.6.0\msvc2019_64\lib\Qt6Widgets.lib  C:\Qt\6.6.0\msvc2019_64\lib\Qt6Gui.lib  C:\Qt\6.6.0\msvc2019_64\lib\Qt6Core.lib  mpr.lib  userenv.lib  C:\Qt\6.6.0\msvc2019_64\lib\Qt6EntryPoint.lib  shell32.lib  d3d11.lib  dxgi.lib  dxguid.lib  d3d12.lib  comdlg32.lib  winspool.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
@@ -173,7 +183,7 @@ build HT_view_autogen\timestamp HT_view_autogen\mocs_compilation.cpp | ${cmake_n
 #############################################
 # Phony custom command for CMakeFiles\HT_view_autogen_timestamp_deps
 
-build CMakeFiles\HT_view_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles\HT_view_autogen_timestamp_deps: phony C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Widgets.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6PrintSupport.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Core.lib C$:\Qt\6.6.0\msvc2019_64\.\bin\moc.exe C$:\Qt\6.6.0\msvc2019_64\.\bin\uic.exe
+build CMakeFiles\HT_view_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles\HT_view_autogen_timestamp_deps: phony C$:\Qt\6.6.0\msvc2019_64\lib\Qt6PrintSupport.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Widgets.lib C$:\Qt\6.6.0\msvc2019_64\.\bin\uic.exe C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Core.lib C$:\Qt\6.6.0\msvc2019_64\.\bin\moc.exe
 
 
 #############################################

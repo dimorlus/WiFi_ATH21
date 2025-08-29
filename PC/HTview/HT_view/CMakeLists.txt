@@ -13,7 +13,6 @@ set(CMAKE_AUTORCC ON)
 # ОБЫЧНАЯ динамическая линковка Qt6
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets PrintSupport)
 
-
 # Исходные файлы
 set(SOURCES
     main.cpp
@@ -25,7 +24,9 @@ set(SOURCES
     csvparser.cpp
     csvworker.h
     csvworker.cpp
+    app.rc
 )
+
 
 add_executable(HT_view ${SOURCES})
 
