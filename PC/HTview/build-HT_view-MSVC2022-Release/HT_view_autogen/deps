@@ -289,7 +289,6 @@ HT_view_autogen/timestamp: \
 	C:/Qt/6.6.0/msvc2019_64/include/QtGui/QAction \
 	C:/Qt/6.6.0/msvc2019_64/include/QtGui/QActionGroup \
 	C:/Qt/6.6.0/msvc2019_64/include/QtGui/QFileSystemModel \
-	C:/Qt/6.6.0/msvc2019_64/include/QtGui/QKeyEvent \
 	C:/Qt/6.6.0/msvc2019_64/include/QtGui/QMatrix4x4 \
 	C:/Qt/6.6.0/msvc2019_64/include/QtGui/QMouseEvent \
 	C:/Qt/6.6.0/msvc2019_64/include/QtGui/QPaintDevice \
@@ -432,7 +431,6 @@ HT_view_autogen/timestamp: \
 	C:/Qt/6.6.0/msvc2019_64/include/QtPrintSupport/qtprintsupportexports.h \
 	C:/Qt/6.6.0/msvc2019_64/include/QtPrintSupport/qtprintsupportglobal.h \
 	C:/Qt/6.6.0/msvc2019_64/include/QtPrintSupport/qtprintsupportversion.h \
-	C:/Qt/6.6.0/msvc2019_64/include/QtWidgets/QApplication \
 	C:/Qt/6.6.0/msvc2019_64/include/QtWidgets/QCommonStyle \
 	C:/Qt/6.6.0/msvc2019_64/include/QtWidgets/QLayout \
 	C:/Qt/6.6.0/msvc2019_64/include/QtWidgets/QMainWindow \

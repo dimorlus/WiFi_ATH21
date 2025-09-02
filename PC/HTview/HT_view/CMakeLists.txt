@@ -27,7 +27,6 @@ set(SOURCES
     app.rc
 )
 
-
 add_executable(HT_view ${SOURCES})
 
 # Динамическая линковка

@@ -135,7 +135,8 @@ void MainWindow::updateRecentFilesMenu()
 {
     QStringList recentFiles = settings->value("recentFiles").toStringList();
     
-    int numRecentFiles = qMin(recentFiles.size(), MaxRecentFiles);
+    // ИСПРАВИТЬ строку 138:
+    int numRecentFiles = qMin(recentFiles.size(), static_cast<int>(MaxRecentFiles));
     
     for (int i = 0; i < numRecentFiles; ++i) {
         QString strippedName = QFileInfo(recentFiles[i]).fileName();
@@ -197,6 +198,11 @@ void MainWindow::setupMenus() {
     openAction->setShortcut(QKeySequence::Open);
     connect(openAction, &QAction::triggered, this, &MainWindow::openFile);
     
+    // ДОБАВИТЬ: новый пункт для добавления файлов к графику
+    QAction *addAction = fileMenu->addAction("&Add to Chart...");
+    addAction->setShortcut(QKeySequence("Ctrl+A"));
+    connect(addAction, &QAction::triggered, this, &MainWindow::addFileToChart);
+    
     // Recent Files submenu
     recentFilesMenu = fileMenu->addMenu("Recent &Files");
     for (int i = 0; i < MaxRecentFiles; ++i) {
@@ -208,6 +214,13 @@ void MainWindow::setupMenus() {
     recentFilesSeparator = recentFilesMenu->addSeparator();
     
     updateRecentFilesMenu();
+    
+    fileMenu->addSeparator();
+    
+    // ДОБАВИТЬ: очистка всех графиков
+    QAction *clearAllAction = fileMenu->addAction("&Clear All");
+    clearAllAction->setShortcut(QKeySequence("Ctrl+Shift+N"));
+    connect(clearAllAction, &QAction::triggered, this, &MainWindow::clearAllGraphs);
     
     fileMenu->addSeparator();
     
@@ -277,10 +290,16 @@ void MainWindow::openFile() {
     addToRecentFiles(filePath);
     updateRecentFilesMenu();
     
-    // Сохранить текущий файл
+    // ИСПРАВИТЬ: использовать ту же логику что в openRecentFile
     currentFilePath = filePath;
     updateWindowTitle(filePath);
     
+    // Очистить все наборы данных
+    dataSets.clear();
+    currentDataSetIndex = -1;
+    overlayMode = false;
+    
+    // Загрузить файл (тот же код что в openRecentFile)
     progressDialog = new QProgressDialog("Loading CSV file...", "Cancel", 0, 100, this);
     progressDialog->setWindowModality(Qt::WindowModal);
     progressDialog->show();
@@ -305,7 +324,7 @@ void MainWindow::openFile() {
             return;
         }
         
-        // ВАЖНО: сначала сохранить исходные данные
+        // Сохранить исходные данные
         rawData = data;
         DEBUG_LOG("Saved rawData with" << rawData.size() << "points");
         
@@ -329,7 +348,9 @@ void MainWindow::openFile() {
         progressDialog->setLabelText("Creating plot...");
         QCoreApplication::processEvents();
         
+        // ИСПРАВИТЬ: использовать старый метод plotData вместо новой системы
         plotData(smoothedData);
+        
         progressDialog->setValue(100);
         progressDialog->close();
         progressDialog = nullptr;
@@ -499,9 +520,12 @@ void MainWindow::setupUI() {
     customPlot->addGraph(customPlot->xAxis, customPlot->yAxis2);
     customPlot->graph(1)->setName("Humidity");
     
-    // НАСТРОЙКА ВЫДЕЛЕНИЯ
-    customPlot->graph(0)->setSelectionDecorator(new QCPSelectionDecorator);
-    customPlot->graph(1)->setSelectionDecorator(new QCPSelectionDecorator);
+    // УЛУЧШИТЬ: настройка выделения с более заметным эффектом
+    for (int i = 0; i < customPlot->graphCount(); ++i) {
+        QCPSelectionDecorator *decorator = new QCPSelectionDecorator;
+        decorator->setPen(QPen(Qt::yellow, 4)); // Желтая обводка при выделении
+        customPlot->graph(i)->setSelectionDecorator(decorator);
+    }
     
     // Настройка курсора (скрыт по умолчанию)
     crossHairV = new QCPItemLine(customPlot);
@@ -555,7 +579,7 @@ void MainWindow::setupUI() {
     setupTimeNavigation();
     
     // Создать статус-бар С ОБНОВЛЕННОЙ СПРАВКОЙ
-    statusBar()->showMessage("Ready | D/W/M-scale, Arrows-navigate, Shift+arrows-smooth pan/zoom, T/H-toggle graphs, P-points/lines, Home/End-start/end, PgUp/PgDn-periods, Shift+Home-reset");
+    statusBar()->showMessage("Ready | D/W/M-scale, Arrows-navigate, Shift+arrows-smooth pan/zoom, T/H-toggle graphs, P-points/lines, Del-delete selected, Home/End-start/end, PgUp/PgDn-periods, Shift+Home-reset");
     
     resize(1200, 800);
 }
@@ -1068,206 +1092,213 @@ void MainWindow::jumpToPeriodBoundary(int direction) {
 }
 
 void MainWindow::toggleTemperatureGraph() {
-    bool visible = customPlot->graph(0)->visible();
-    customPlot->graph(0)->setVisible(!visible);
+    if (customPlot->graphCount() < 1) return;
+    
+    // ИСПРАВИТЬ: переключать все графики температуры (четные индексы)
+    bool anyVisible = false;
+    
+    // Проверить, есть ли хотя бы один видимый график температуры
+    for (int i = 0; i < customPlot->graphCount(); i += 2) {
+        if (customPlot->graph(i)->visible()) {
+            anyVisible = true;
+            break;
+        }
+    }
+    
+    // Переключить все графики температуры
+    for (int i = 0; i < customPlot->graphCount(); i += 2) {
+        customPlot->graph(i)->setVisible(!anyVisible);
+    }
+    
     customPlot->replot();
     
-    QString status = visible ? "Temperature graph hidden" : "Temperature graph shown";
+    QString status = anyVisible ? "Temperature graphs hidden" : "Temperature graphs shown";
     statusBar()->showMessage(status, 2000);
 }
 
 void MainWindow::toggleHumidityGraph() {
-    bool visible = customPlot->graph(1)->visible();
-    customPlot->graph(1)->setVisible(!visible);
+    if (customPlot->graphCount() < 2) return;
+    
+    // ИСПРАВИТЬ: переключать все графики влажности (нечетные индексы)
+    bool anyVisible = false;
+    
+    // Проверить, есть ли хотя бы один видимый график влажности
+    for (int i = 1; i < customPlot->graphCount(); i += 2) {
+        if (customPlot->graph(i)->visible()) {
+            anyVisible = true;
+            break;
+        }
+    }
+    
+    // Переключить все графики влажности
+    for (int i = 1; i < customPlot->graphCount(); i += 2) {
+        customPlot->graph(i)->setVisible(!anyVisible);
+    }
+    
     customPlot->replot();
     
-    QString status = visible ? "Humidity graph hidden" : "Humidity graph shown";
+    QString status = anyVisible ? "Humidity graphs hidden" : "Humidity graphs shown";
     statusBar()->showMessage(status, 2000);
 }
 
 void MainWindow::toggleDisplayMode() {
-    DEBUG_LOG("toggleDisplayMode called");
-    DEBUG_LOG("originalData size:" << originalData.size());
-    DEBUG_LOG("rawData size:" << rawData.size());
-    DEBUG_LOG("showPointsMode:" << showPointsMode);
-    
-    if (originalData.isEmpty()) {
-        DEBUG_LOG("originalData is empty, returning");
+    // ИСПРАВИТЬ: проверить оба способа хранения данных
+    if (dataSets.isEmpty() && originalData.isEmpty()) {
         return;
     }
     
-    if (rawData.isEmpty()) {
-        DEBUG_LOG("rawData is empty, cannot switch to points mode");
-        statusBar()->showMessage("Error: No raw data available", 3000);
-        return;
-    }
+    // ИСПРАВИТЬ: сохранить текущий зум перед обновлением
+    QCPRange xRange = customPlot->xAxis->range();
+    QCPRange yRange = customPlot->yAxis->range();
+    QCPRange y2Range = customPlot->yAxis2->range();
     
     showPointsMode = !showPointsMode;
-    DEBUG_LOG("Switching to mode:" << (showPointsMode ? "Points" : "Lines"));
     
-    QVector<double> timeData, tempData, humData;
-    
-    if (showPointsMode) {
-        // Режим точек - использовать rawData
-        for (const DataPoint& point : rawData) {
-            timeData.append(point.timestamp.toSecsSinceEpoch());
-            tempData.append(point.temperature);
-            humData.append(point.humidity);
-        }
-        
-        DEBUG_LOG("Points mode: data size:" << timeData.size());
-        
-        // Настроить как точки с настройками из config
-        customPlot->graph(0)->setLineStyle(QCPGraph::lsNone);
-        customPlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 
-            vizSettings.temperatureColor, vizSettings.temperatureColor, vizSettings.pointSize));
-        customPlot->graph(0)->setData(timeData, tempData);
-        
-        customPlot->graph(1)->setLineStyle(QCPGraph::lsNone);
-        customPlot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 
-            vizSettings.humidityColor, vizSettings.humidityColor, vizSettings.pointSize));
-        customPlot->graph(1)->setData(timeData, humData);
-        
-        statusBar()->showMessage("Display mode: Points (raw data)", 2000);
-    } else {
-        // Режим линий - использовать originalData
-        for (const DataPoint& point : originalData) {
-            timeData.append(point.timestamp.toSecsSinceEpoch());
-            tempData.append(point.temperature);
-            humData.append(point.humidity);
-        }
-        
-        DEBUG_LOG("Lines mode: data size:" << timeData.size());
-        
-        // Настроить как линии с настройками из config
-        QPen tempPen(vizSettings.temperatureColor, vizSettings.temperatureLineWidth, Qt::SolidLine);
-        customPlot->graph(0)->setPen(tempPen);
-        customPlot->graph(0)->setLineStyle(QCPGraph::lsLine);
-        customPlot->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
-        customPlot->graph(0)->setData(timeData, tempData);
-        
-        QPen humPen(vizSettings.humidityColor, vizSettings.humidityLineWidth, Qt::SolidLine);
-        customPlot->graph(1)->setPen(humPen);
-        customPlot->graph(1)->setLineStyle(QCPGraph::lsLine);
-        customPlot->graph(1)->setScatterStyle(QCPScatterStyle::ssNone);
-        customPlot->graph(1)->setData(timeData, humData);
-        
-        statusBar()->showMessage("Display mode: Lines (smoothed)", 2000);
+    // ИСПРАВИТЬ: использовать правильный метод в зависимости от того, как загружены данные
+    if (!dataSets.isEmpty()) {
+        // Новая система множественных графиков
+        updateAllGraphs();
+    } else if (!originalData.isEmpty()) {
+        // Старая система одного файла
+        const QVector<DataPoint>& dataToUse = showPointsMode ? rawData : originalData;
+        plotData(dataToUse);
     }
     
+    // ИСПРАВИТЬ: восстановить зум после обновления
+    customPlot->xAxis->setRange(xRange);
+    customPlot->yAxis->setRange(yRange);
+    customPlot->yAxis2->setRange(y2Range);
+    
+    updateTemperatureGrid();
     customPlot->replot();
-    DEBUG_LOG("toggleDisplayMode completed");
+    
+    statusBar()->showMessage(
+        QString("Display mode: %1").arg(showPointsMode ? "Points (raw data)" : "Lines (smoothed)"), 
+        2000);
 }
 
-// === НЕДОСТАЮЩИЕ МЕТОДЫ ===
+// ДОБАВИТЬ в конец файла все недостающие методы:
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
     if (obj == customPlot) {
         if (event->type() == QEvent::KeyPress) {
             QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-            bool shiftPressed = keyEvent->modifiers() & Qt::ShiftModifier;
             
+            // Навигация по времени
             switch (keyEvent->key()) {
-            // === РЕЖИМЫ МАСШТАБИРОВАНИЯ ===
+            case Qt::Key_Left:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    panHorizontal(-1);  // Плавный сдвиг влево
+                } else {
+                    navigateTime(-1);   // Обычная навигация
+                }
+                return true;
+                
+            case Qt::Key_Right:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    panHorizontal(1);   // Плавный сдвиг вправо
+                } else {
+                    navigateTime(1);    // Обычная навигация
+                }
+                return true;
+                
+            case Qt::Key_Up:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    zoomVertical(0.8);  // Увеличить масштаб
+                } else {
+                    panVertical(1);     // Сдвинуть вверх
+                }
+                return true;
+                
+            case Qt::Key_Down:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    zoomVertical(1.25); // Уменьшить масштаб
+                } else {
+                    panVertical(-1);    // Сдвинуть вниз
+                }
+                return true;
+                
+            case Qt::Key_PageUp:
+                jumpToPeriodBoundary(-1);
+                return true;
+                
+            case Qt::Key_PageDown:
+                jumpToPeriodBoundary(1);
+                return true;
+                
+            case Qt::Key_Home:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    resetAllZoom();
+                } else {
+                    goToStart();
+                }
+                return true;
+                
+            case Qt::Key_End:
+                goToEnd();
+                return true;
+                
             case Qt::Key_D:
                 setTimeScale(Day);
                 return true;
+                
             case Qt::Key_W:
                 setTimeScale(Week);
                 return true;
+                
             case Qt::Key_M:
                 setTimeScale(Month);
                 return true;
                 
-            // === НАВИГАЦИЯ ВЛЕВО/ВПРАВО ===
-            case Qt::Key_Left:
-                if (shiftPressed) {
-                    // Shift+Left = плавное перемещение влево
-                    panHorizontal(-1);
-                } else {
-                    // Left = быстрая навига влево
-                    navigateTime(-1);
-                }
-                return true;
-            case Qt::Key_Right:
-                if (shiftPressed) {
-                    // Shift+Right = плавное перемещение вправо
-                    panHorizontal(1);
-                } else {
-                    // Right = быстрая навига вправо
-                    navigateTime(1);
-                }
-                return true;
-                
-            // === НАВИГАЦИЯ ВВЕРХ/ВНИЗ ===
-            case Qt::Key_Up:
-                if (shiftPressed) {
-                    // Shift+Up = Zoom In по вертикали
-                    zoomVertical(0.8); // уменьшить диапазон = увеличить масштаб
-                } else {
-                    // Up = сдвинуть графики вверх
-                    panVertical(1);
-                }
-                return true;
-            case Qt::Key_Down:
-                if (shiftPressed) {
-                    // Shift+Down = Zoom Out по вертикали
-                    zoomVertical(1.25); // увеличить диапазон = уменьшить масштаб
-                } else {
-                    // Down = сдвинуть графики вниз
-                    panVertical(-1);
-                }
-                return true;
-                
-            // === ПЕРЕХОДЫ К НАЧАЛУ/КОНЦУ ===
-            case Qt::Key_Home:
-                if (shiftPressed) {
-                    // Shift+Home = полный сброс зума
-                    resetAllZoom();
-                } else {
-                    // Home = к началу данных
-                    goToStart();
-                }
-                return true;
-            case Qt::Key_End:
-                // End = к концу данных
-                goToEnd();
-                return true;
-                
-            // === ПЕРЕХОДЫ ПО ГРАНИЦАМ ПЕРИОДОВ ===
-            case Qt::Key_PageUp:
-                jumpToPeriodBoundary(-1); // назад
-                return true;
-            case Qt::Key_PageDown:
-                jumpToPeriodBoundary(1);  // вперед
-                return true;
-                
-            // === ВКЛЮЧЕНИЕ/ВЫКЛЮЧЕНИЕ ГРАФИКОВ ===
             case Qt::Key_T:
                 toggleTemperatureGraph();
                 return true;
+                
             case Qt::Key_H:
                 toggleHumidityGraph();
                 return true;
-
+                
             case Qt::Key_P:
-                DEBUG_LOG("P key pressed");
                 toggleDisplayMode();
                 return true;
-    
+                
+            // ДОБАВИТЬ: удаление выделенных графиков
+            case Qt::Key_Delete:
+                deleteSelectedGraphs();
+                return true;
             }
-        } else if (event->type() == QEvent::Wheel) {
+        }
+        
+        if (event->type() == QEvent::Wheel) {
             QWheelEvent *wheelEvent = static_cast<QWheelEvent*>(event);
             
-            // Плавный зум только по X
-            double factor = wheelEvent->angleDelta().y() > 0 ? 0.9 : 1.1;
-            customPlot->xAxis->scaleRange(factor, customPlot->xAxis->pixelToCoord(wheelEvent->position().x()));
-            customPlot->replot();
-            
-            // Обновить статистику после зума
-            updateStatusStats();
-            
-            return true;
+            if (wheelEvent->modifiers() & Qt::ShiftModifier) {
+                // Shift + колесо = вертикальный зум
+                double factor = wheelEvent->angleDelta().y() > 0 ? 0.9 : 1.1;
+                zoomVertical(factor);
+                return true;
+            } else {
+                // Обычное колесо = горизонтальный зум (по времени)
+                QCPRange range = customPlot->xAxis->range();
+                double center = (range.lower + range.upper) / 2.0;
+                double factor = wheelEvent->angleDelta().y() > 0 ? 0.9 : 1.1;
+                double newSize = range.size() * factor;
+                customPlot->xAxis->setRange(center - newSize/2, center + newSize/2);
+                customPlot->replot();
+                updateStatusStats();
+                return true;
+            }
+        }
+        
+        if (event->type() == QEvent::KeyRelease) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+            if (keyEvent->key() == Qt::Key_Shift) {
+                if (showCursor) {
+                    hideCrosshair();
+                    showCursor = false;
+                }
+                return true;
+            }
         }
     }
     
@@ -1275,765 +1306,70 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 }
 
 void MainWindow::onMouseMove(QMouseEvent* event) {
-    if (!originalData.isEmpty()) {
-        // ИСПРАВЛЕНИЕ: убедиться что customPlot имеет фокус для клавиш
-        if (!customPlot->hasFocus()) {
-            customPlot->setFocus();
-        }
-        
-        bool shiftPressed = QApplication::keyboardModifiers() & Qt::ShiftModifier;
-        
-        if (shiftPressed && !showCursor) {
-            showCursor = true;
-        } else if (!shiftPressed && showCursor) {
-            showCursor = false;
-            hideCrosshair();
-            // Показать статистику видимого диапазона вместо стандартного сообщения
-            statusBar()->showMessage(getVisibleRangeStats());
-        }
-        
-        if (showCursor) {
-            double x = customPlot->xAxis->pixelToCoord(event->pos().x());
-            double y = customPlot->yAxis->pixelToCoord(event->pos().y());
-            
-            updateCrosshair(x, y);
-            
-            // Показать значения в статус-баре
-            QString valueText = formatValueAtPosition(x);
-            statusBar()->showMessage(valueText);
-        }
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+        double x = customPlot->xAxis->pixelToCoord(event->pos().x());
+        double y = customPlot->yAxis->pixelToCoord(event->pos().y());
+        updateCrosshair(x, y);
+        showCursor = true;
+    } else if (showCursor) {
+        hideCrosshair();
+        showCursor = false;
     }
 }
 
 void MainWindow::onXAxisRangeChanged(const QCPRange &newRange) {
-    // Обновить сетку температуры при изменении диапазона времени
     updateTemperatureGrid();
     updateStatusStats();
 }
 
 void MainWindow::setupTimeNavigation() {
+    // Инициализация переменных навигации по времени
     currentTimeScale = Day;
-}
-
-void MainWindow::setTimeScale(TimeScale scale) {
-    if (originalData.isEmpty()) return;
-    
-    currentTimeScale = scale;
-    
-    // Получить текущий центр
-    double currentCenter = (customPlot->xAxis->range().lower + customPlot->xAxis->range().upper) / 2.0;
-    
-    // Определить новый размер диапазона
-    double newRangeSize;
-    switch (scale) {
-    case Day:
-        newRangeSize = 86400; // 24 часа в секундах
-        break;
-    case Week:
-        newRangeSize = 604800; // 7 дней в секундах
-        break;
-    case Month:
-        newRangeSize = 2592000; // 30 дней в секундах
-        break;
-    }
-    
-    // Применить новый диапазон
-    double newStart = currentCenter - newRangeSize / 2.0;
-    double newEnd = currentCenter + newRangeSize / 2.0;
-    
-    // Ограничить границами данных
-    double dataStart = originalData.first().timestamp.toSecsSinceEpoch();
-    double dataEnd = originalData.last().timestamp.toSecsSinceEpoch();
-    
-    if (newStart < dataStart) {
-        newStart = dataStart;
-        newEnd = newStart + newRangeSize;
-    }
-    if (newEnd > dataEnd) {
-        newEnd = dataEnd;
-        newStart = newEnd - newRangeSize;
-    }
-    if (newStart < dataStart) {
-        newStart = dataStart;
-    }
-    
-    customPlot->xAxis->setRange(newStart, newEnd);
-    customPlot->replot();
-    updateStatusStats();
-    
-    QString scaleText;
-    switch (scale) {
-    case Day: scaleText = "Day"; break;
-    case Week: scaleText = "Week"; break;
-    case Month: scaleText = "Month"; break;
-    }
-    statusBar()->showMessage(QString("Time scale: %1").arg(scaleText), 2000);
-}
-
-void MainWindow::navigateTime(int direction) {
-    if (originalData.isEmpty()) return;
-    
-    // Навигация на 1/4 от текущего диапазона
-    QCPRange currentRange = customPlot->xAxis->range();
-    double step = currentRange.size() * 0.25 * direction;
-    
-    double newStart = currentRange.lower + step;
-    double newEnd = currentRange.upper + step;
-    
-    // Ограничить границами данных
-    double dataStart = originalData.first().timestamp.toSecsSinceEpoch();
-    double dataEnd = originalData.last().timestamp.toSecsSinceEpoch();
-    
-    if (newStart < dataStart) {
-        newStart = dataStart;
-        newEnd = newStart + currentRange.size();
-    }
-    if (newEnd > dataEnd) {
-        newEnd = dataEnd;
-        newStart = newEnd - currentRange.size();
-    }
-    if (newStart < dataStart) {
-        newStart = dataStart;
-    }
-    
-    customPlot->xAxis->setRange(newStart, newEnd);
-    customPlot->replot();
-    updateStatusStats();
-}
-
-void MainWindow::updateCrosshair(double x, double y) {
-    // Найти ближайшую точку данных
-    double minDistance = std::numeric_limits<double>::max();
-    DataPoint closestPoint;
-    bool found = false;
-    
-    for (const DataPoint& point : originalData) {
-        double pointTime = point.timestamp.toSecsSinceEpoch();
-        double distance = qAbs(pointTime - x);
-        
-        if (distance < minDistance) {
-            minDistance = distance;
-            closestPoint = point;
-            found = true;
-        }
-    }
-    
-    if (!found) return;
-    
-    double snapX = closestPoint.timestamp.toSecsSinceEpoch();
-    
-    // Обновить позицию курсора
-    crossHairV->start->setCoords(snapX, customPlot->yAxis->range().lower);
-    crossHairV->end->setCoords(snapX, customPlot->yAxis->range().upper);
-    
-    crossHairH->start->setCoords(customPlot->xAxis->range().lower, closestPoint.temperature);
-    crossHairH->end->setCoords(customPlot->xAxis->range().upper, closestPoint.temperature);
-    
-    // Показать линии
-    crossHairV->setVisible(true);
-    crossHairH->setVisible(true);
-    
-    // Обновить подпись
-    QString labelText = QString("Time: %1\nTemp: %2°C\nHumidity: %3%")
-        .arg(closestPoint.timestamp.toString("dd.MM.yyyy hh:mm:ss"))
-        .arg(closestPoint.temperature, 0, 'f', 1)
-        .arg(closestPoint.humidity, 0, 'f', 1);
-    
-    valueLabel->setText(labelText);
-    valueLabel->position->setCoords(snapX, closestPoint.temperature);
-    valueLabel->setVisible(true);
-    
-    customPlot->replot();
-}
-
-void MainWindow::hideCrosshair() {
-    crossHairV->setVisible(false);
-    crossHairH->setVisible(false);
-    valueLabel->setVisible(false);
-    customPlot->replot();
-}
-
-QString MainWindow::formatValueAtPosition(double timePos) {
-    // Найти ближайшую точку данных
-    double minDistance = std::numeric_limits<double>::max();
-    DataPoint closestPoint;
-    bool found = false;
-    
-    for (const DataPoint& point : originalData) {
-        double pointTime = point.timestamp.toSecsSinceEpoch();
-        double distance = qAbs(pointTime - timePos);
-        
-        if (distance < minDistance) {
-            minDistance = distance;
-            closestPoint = point;
-            found = true;
-        }
-    }
-    
-    if (!found) return "No data";
-    
-    return QString("Time: %1 | Temp: %2°C | Humidity: %3%")
-        .arg(closestPoint.timestamp.toString("dd.MM.yyyy hh:mm:ss"))
-        .arg(closestPoint.temperature, 0, 'f', 1)
-        .arg(closestPoint.humidity, 0, 'f', 1);
-}
-
-QString MainWindow::getVisibleRangeStats() {
-    if (originalData.isEmpty()) return "No data";
-    
-    QCPRange xRange = customPlot->xAxis->range();
-    QDateTime startTime = QDateTime::fromSecsSinceEpoch(xRange.lower);
-    QDateTime endTime = QDateTime::fromSecsSinceEpoch(xRange.upper);
-    
-    // Подсчитать количество точек в видимом диапазоне
-    int visiblePoints = 0;
-    double tempSum = 0, humSum = 0;
-    double tempMin = std::numeric_limits<double>::max();
-    double tempMax = std::numeric_limits<double>::lowest();
-    double humMin = std::numeric_limits<double>::max();
-    double humMax = std::numeric_limits<double>::lowest();
-    
-    for (const DataPoint& point : originalData) {
-        double pointTime = point.timestamp.toSecsSinceEpoch();
-        if (pointTime >= xRange.lower && pointTime <= xRange.upper) {
-            visiblePoints++;
-            tempSum += point.temperature;
-            humSum += point.humidity;
-            tempMin = qMin(tempMin, point.temperature);
-            tempMax = qMax(tempMax, point.temperature);
-            humMin = qMin(humMin, point.humidity);
-            humMax = qMax(humMax, point.humidity);
-        }
-    }
-    
-    if (visiblePoints == 0) return "No data in visible range";
-    
-    double tempAvg = tempSum / visiblePoints;
-    double humAvg = humSum / visiblePoints;
-    
-    return QString("Visible: %1 points | Period: %2 - %3 | Temp: %4°C (avg), %5°C-%6°C | Hum: %7% (avg), %8%-%9%")
-        .arg(visiblePoints)
-        .arg(startTime.toString("dd.MM hh:mm"))
-        .arg(endTime.toString("dd.MM hh:mm"))
-        .arg(tempAvg, 0, 'f', 1)
-        .arg(tempMin, 0, 'f', 1)
-        .arg(tempMax, 0, 'f', 1)
-        .arg(humAvg, 0, 'f', 1)
-        .arg(humMin, 0, 'f', 1)
-        .arg(humMax, 0, 'f', 1);
-}
-
-void MainWindow::updateStatusStats() {
-    if (!showCursor) {
-        statusBar()->showMessage(getVisibleRangeStats(), 0);
-    }
-}
-
-// === МЕТОДЫ ПЕЧАТИ И ЭКСПОРТА ===
-
-void MainWindow::printChart() {
-    if (originalData.isEmpty()) {
-        QMessageBox::information(this, "Print", "No data to print");
-        return;
-    }
-    
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setPageOrientation(QPageLayout::Landscape);
-    
-    QPrintDialog dialog(&printer, this);
-    dialog.setWindowTitle("Print Chart");
-    
-    if (dialog.exec() == QDialog::Accepted) {
-        bool useColor = !blackWhitePrintAction->isChecked();
-        renderChartToPrinter(&printer, useColor);
-        statusBar()->showMessage("Chart printed", 2000);
-    }
-}
-
-void MainWindow::printPreview() {
-    if (originalData.isEmpty()) {
-        QMessageBox::information(this, "Print Preview", "No data to preview");
-        return;
-    }
-    
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setPageOrientation(QPageLayout::Landscape);
-    
-    QPrintPreviewDialog preview(&printer, this);
-    preview.setWindowTitle("Print Preview");
-    
-    connect(&preview, &QPrintPreviewDialog::paintRequested, this, [this](QPrinter *p) {
-        bool useColor = !blackWhitePrintAction->isChecked();
-        renderChartToPrinter(p, useColor);
-    });
-    
-    preview.exec();
-}
-
-void MainWindow::copyChartToClipboard() {
-    if (originalData.isEmpty()) {
-        QMessageBox::information(this, "Copy", "No data to copy");
-        return;
-    }
-    
-    // Создать изображение с высоким разрешением
-    QPixmap pixmap = customPlot->toPixmap(1920, 1080, 2.0);
-    
-    QApplication::clipboard()->setPixmap(pixmap);
-    statusBar()->showMessage("Chart copied to clipboard", 2000);
-}
-
-void MainWindow::exportChart() {
-    if (originalData.isEmpty()) {
-        QMessageBox::information(this, "Export", "No data to export");
-        return;
-    }
-    
-    QString lastDir = getLastDirectory();
-    QString fileName = QFileInfo(currentFilePath).baseName() + "_chart";
-    QString defaultPath = lastDir + "/" + fileName;
-    
-    QString filePath = QFileDialog::getSaveFileName(this,
-        "Export Chart", defaultPath,
-        "PNG Images (*.png);;JPG Images (*.jpg);;PDF Files (*.pdf);;All Files (*)");
-    
-    if (filePath.isEmpty()) return;
-    
-    // Сохранить каталог
-    setLastDirectory(QFileInfo(filePath).absolutePath());
-    
-    QFileInfo fileInfo(filePath);
-    QString extension = fileInfo.suffix().toLower();
-    
-    bool success = false;
-    
-    if (extension == "pdf") {
-        // Экспорт в PDF
-        QPrinter printer(QPrinter::HighResolution);
-        printer.setOutputFormat(QPrinter::PdfFormat);
-        printer.setOutputFileName(filePath);
-        printer.setPageOrientation(QPageLayout::Landscape);
-        
-        renderChartToPrinter(&printer, true); // PDF всегда цветной
-        success = true;
-    } else {
-        // Экспорт в растровый формат
-        QPixmap pixmap = customPlot->toPixmap(1920, 1080, 2.0);
-        success = pixmap.save(filePath);
-    }
-    
-    if (success) {
-        statusBar()->showMessage(QString("Chart exported to %1").arg(filePath), 3000);
-    } else {
-        QMessageBox::warning(this, "Export Error", "Failed to export chart");
-    }
-}
-
-void MainWindow::renderChartToPrinter(QPrinter *printer, bool useColor) {
-    QPainter painter(printer);
-    
-    QRectF pageRect = painter.viewport();
-    DEBUG_LOG("Page rect:" << pageRect);
-    
-    double scale = qMin(pageRect.width() / 1000.0, pageRect.height() / 700.0);
-    scale = qBound(0.8, scale, 2.5);
-    DEBUG_LOG("Scale:" << scale);
-    
-    // Проверка на PDF экспорт
-    bool isPdfExport = (printer->outputFormat() == QPrinter::PdfFormat && 
-                       !printer->outputFileName().isEmpty());
-    
-    // Размеры для заголовка и графика
-    QRectF titleRect, chartRect;
-    
-    if (isPdfExport) {
-        // PDF без заголовка - весь лист для графика
-        chartRect = pageRect;
-    } else {
-        // Печать с заголовком - БЕЗОПАСНЫЙ размер шрифта
-        QFont titleFont = painter.font();
-        int titleSize = qBound(8, int(10 * scale), 16);
-        titleFont.setPointSize(titleSize);
-        painter.setFont(titleFont);
-        
-        QFontMetrics fm(titleFont);
-        int titleHeight = qBound(15, fm.height() + 15, 60);
-        
-        titleRect = QRectF(pageRect.x(), pageRect.y(), pageRect.width(), titleHeight);
-        chartRect = QRectF(pageRect.x(), pageRect.y() + titleHeight,
-                          pageRect.width(), pageRect.height() - titleHeight);
-        
-        // Нарисовать заголовок
-        QString fileName = QFileInfo(currentFilePath).fileName();
-        if (fileName.isEmpty()) fileName = "Chart";
-        
-        painter.drawText(titleRect, Qt::AlignCenter, fileName);
-    }
-    
-    // === ПОЛУЧИТЬ ДАННЫЕ ===
-    QCPDataContainer<QCPGraphData>::const_iterator tempBegin = customPlot->graph(0)->data()->constBegin();
-    QCPDataContainer<QCPGraphData>::const_iterator tempEnd = customPlot->graph(0)->data()->constEnd();
-    QCPDataContainer<QCPGraphData>::const_iterator humBegin = customPlot->graph(1)->data()->constBegin();
-    QCPDataContainer<QCPGraphData>::const_iterator humEnd = customPlot->graph(1)->data()->constEnd();
-    
-    if (tempBegin == tempEnd) {
-        painter.end();
-        return;
-    }
-    
-    // Получить диапазоны осей с экрана
-    QCPRange xRange = customPlot->xAxis->range();
-    QCPRange yRange = customPlot->yAxis->range();
-    QCPRange y2Range = customPlot->yAxis2->range();
-    
-    // УВЕЛИЧЕННЫЕ отступы
-    double marginLeft = qBound(60.0, 90.0 * scale, 140.0);
-    double marginRight = qBound(60.0, 90.0 * scale, 140.0);
-    double marginTop = qBound(15.0, 30.0 * scale, 60.0);
-    double marginBottom = qBound(80.0, 140.0 * scale, 200.0);
-    
-    QRectF plotArea(chartRect.x() + marginLeft, chartRect.y() + marginTop,
-                   chartRect.width() - marginLeft - marginRight,
-                   chartRect.height() - marginTop - marginBottom);
-    
-    // === БЕЗОПАСНЫЕ ШРИФТЫ ===
-    QFont axisFont = painter.font();
-    QFont tickFont = painter.font();
-    QFont legendFont = painter.font();
-    
-    int axisSize = qBound(6, int(9 * scale), 14);
-    int tickSize = qBound(5, int(7 * scale), 11);
-    int legendSize = qBound(5, int(8 * scale), 12);
-    
-    axisFont.setPointSize(axisSize);
-    tickFont.setPointSize(tickSize);
-    legendFont.setPointSize(legendSize);
-    
-    // === ВЫЧИСЛИТЬ ТОЧНЫЕ ПОЗИЦИИ ТЕМПЕРАТУРЫ ===
-    // Получить диапазон температуры и вычислить градусные позиции
-    double tempMinRange = yRange.lower;
-    double tempMaxRange = yRange.upper;
-    
-    // Найти минимальный и максимальный целый градус в диапазоне
-    int tempMinInt = qFloor(tempMinRange);
-    int tempMaxInt = qCeil(tempMaxRange);
-    
-    // Функция для преобразования температуры в Y координату
-    auto tempToY = [&](double temp) -> double {
-        return plotArea.bottom() - (temp - tempMinRange) / (tempMaxRange - tempMinRange) * plotArea.height();
-    };
-    
-    // === РИСУЕМ СЕТКУ ТЕМПЕРАТУРЫ - ТОЧНО ПО ГРАДУСАМ ===
-    painter.setPen(QPen(Qt::lightGray, qBound(0.5, 1.0 * scale, 2.0), Qt::DotLine));
-    
-    // Горизонтальные линии сетки ТОЛЬКО на целых градусах
-    for (int tempValue = tempMinInt; tempValue <= tempMaxInt; ++tempValue) {
-        if (tempValue >= tempMinRange && tempValue <= tempMaxRange) {
-            double y = tempToY(tempValue);
-            painter.drawLine(QPointF(plotArea.left(), y), QPointF(plotArea.right(), y));
-        }
-    }
-    
-    // Вертикальные линии сетки (время)
-    int numVertLines = 8;
-    for (int i = 0; i <= numVertLines; ++i) {
-        double x = plotArea.left() + (plotArea.width() * i / numVertLines);
-        painter.drawLine(QPointF(x, plotArea.top()), QPointF(x, plotArea.bottom()));
-    }
-    
-    // === РИСУЕМ ОСИ С РИСКАМИ ===
-    painter.setPen(QPen(Qt::black, qBound(1.0, 1.5 * scale, 3.0)));
-    painter.drawRect(plotArea);
-    
-    // РИСКИ НА ОСЯХ
-    double tickLength = qBound(3.0, 6.0 * scale, 12.0);
-    double subTickLength = tickLength * 0.6; // Полуградусные риски короче
-    
-    // Риски на нижней оси (время)
-    int numXTicks = 8;
-    for (int i = 0; i <= numXTicks; ++i) {
-        double x = plotArea.left() + (plotArea.width() * i / numXTicks);
-        painter.drawLine(QPointF(x, plotArea.bottom()), 
-                        QPointF(x, plotArea.bottom() + tickLength));
-    }
-    
-    // РИСКИ НА ЛЕВОЙ ОСИ ТЕМПЕРАТУРЫ - С ПОЛУГРАДУСНЫМИ
-    painter.setPen(QPen(Qt::black, qBound(1.0, 1.5 * scale, 3.0)));
-    
-    // Проходим по всем 0.5° в диапазоне
-    double tempStartRange = qFloor(tempMinRange * 2) / 2.0;  // Округлить до ближайшего 0.5°
-    double tempEndRange = qCeil(tempMaxRange * 2) / 2.0;
-    
-    for (double tempValue = tempStartRange; tempValue <= tempEndRange; tempValue += 0.5) {
-        if (tempValue >= tempMinRange && tempValue <= tempMaxRange) {
-            double y = tempToY(tempValue);
-            
-            bool isWholeDegree = (qAbs(tempValue - qRound(tempValue)) < 0.01);
-            double currentTickLength = isWholeDegree ? tickLength : subTickLength;
-            
-            painter.drawLine(QPointF(plotArea.left(), y), 
-                           QPointF(plotArea.left() - currentTickLength, y));
-        }
-    }
-    
-    // Риски на правой оси (влажность) - каждые 5%
-    double humMinRange = y2Range.lower;
-    double humMaxRange = y2Range.upper;
-    
-    auto humToY = [&](double hum) -> double {
-        return plotArea.bottom() - (hum - humMinRange) / (humMaxRange - humMinRange) * plotArea.height();
-    };
-    
-    int humStartInt = qFloor(humMinRange / 5) * 5;  // Округлить до ближайших 5%
-    int humEndInt = qCeil(humMaxRange / 5) *  5;
-    
-    for (int humValue = humStartInt; humValue <= humEndInt; humValue += 5) {
-        if (humValue >= humMinRange && humValue <= humMaxRange) {
-                                                                                     double y = humToY(humValue);
-            painter.drawLine(QPointF(plotArea.right(), y), 
-                           QPointF(plotArea.right() + tickLength, y));
-        }
-    }
-    
-    // === ПОДПИСИ НА ОСЯХ ===
-    painter.setFont(tickFont);
-    painter.setPen(QPen(Qt::black));
-    
-    // ПОДПИСИ ВРЕМЕНИ
-    double timeRange = xRange.size();
-    bool showOnlyTime = (timeRange <= 86400);
-   
-      
-    QFontMetrics tickFM(tickFont);
-    
-    for (int i = 0; i <= numXTicks; ++i) {
-        double timeValue = xRange.lower + (xRange.size() * i / numXTicks);
-        double x = plotArea.left() + (plotArea.width() * i / numXTicks);
-        
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(timeValue);
-        
-        QString label;
-        if (showOnlyTime) {
-            label = dt.toString("hh:mm");
-        } else {
-            label = dt.toString("dd.MM\nhh:mm");
-        }
-        
-        QRect textBounds = tickFM.boundingRect(label);
-        int textWidth = textBounds.width();
-        double textRectWidth = qMax(50.0, textWidth + 10.0);
-        
-        QRectF textRect(x - textRectWidth/2, plotArea.bottom() + tickLength + 5, 
-                       textRectWidth, 35);
-        painter.drawText(textRect, Qt::AlignCenter, label);
-    }
-    
-    // ПОДПИСИ ТЕМПЕРАТУРЫ - ТОЛЬКО НА ЦЕЛЫХ ГРАДУСАХ
-    for (int tempValue = tempMinInt; tempValue <= tempMaxInt; ++tempValue) {
-        if (tempValue >= tempMinRange && tempValue <= tempMaxRange) {
-            double y = tempToY(tempValue);
-            QString tempStr = QString::number(tempValue);
-            
-            QRectF textRect(plotArea.left() - tickLength - 35, y - 8, 30, 16);
-            painter.drawText(textRect, Qt::AlignRight | Qt::AlignVCenter, tempStr);
-        }
-    }
-    
-    // ПОДПИСИ ВЛАЖНОСТИ - КАЖДЫЕ 5%
-    for (int humValue = humStartInt; humValue <= humEndInt; humValue += 5) {
-        if (humValue >= humMinRange && humValue <= humMaxRange) {
-            double y = humToY(humValue);
-            QString humStr = QString::number(humValue);
-            
-            QRectF textRect(plotArea.right() + tickLength + 5, y - 8, 30, 16);
-            painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, humStr);
-        }
-    }
-    
-    // === ФУНКЦИЯ преобразования координат ===
-    auto mapToPlot = [&](double x, double y, const QCPRange& yAxisRange) -> QPointF {
-        double px = plotArea.left() + (x - xRange.lower) / xRange.size() * plotArea.width();
-        double py = plotArea.bottom() - (y - yAxisRange.lower) / yAxisRange.size() * plotArea.height();
-        return QPointF(px, py);
-    };
-    
-    // === РИСУЕМ ГРАФИКИ ===
-    double lineWidth = qBound(1.5, 2.5 * scale, 4.0);
-    
-    // График температуры
-    if (useColor) {
-        painter.setPen(QPen(Qt::red, lineWidth));
-    } else {
-        painter.setPen(QPen(Qt::black, lineWidth));
-    }
-    
-    QPointF prevTempPoint;
-    bool firstTempPoint = true;
-    
-    for (auto it = tempBegin; it != tempEnd; ++it) {
-        if (it->key >= xRange.lower && it->key <= xRange.upper) {
-            QPointF point = mapToPlot(it->key, it->value, yRange);
-            
-            if (!firstTempPoint) {
-                painter.drawLine(prevTempPoint, point);
-            }
-            prevTempPoint = point;
-            firstTempPoint = false;
-        }
-    }
-    
-    // График влажности
-    if (useColor) {
-        painter.setPen(QPen(Qt::blue, lineWidth));
-    } else {
-        painter.setPen(QPen(Qt::black, lineWidth * 0.7, Qt::DashLine));
-    }
-
-    
-    QPointF prevHumPoint;
-    bool firstHumPoint = true;
-    
-    for (auto it = humBegin; it != humEnd; ++it) {
-        if (it->key >= xRange.lower && it->key <= xRange.upper) {
-            QPointF point = mapToPlot(it->key, it->value, y2Range);
-            
-            if (!firstHumPoint) {
-                painter.drawLine(prevHumPoint, point);
-            }
-            prevHumPoint = point;
-            firstHumPoint = false;
-        }
-    }
-    
-    // === ПОДПИСИ ОСЕЙ ===
-    painter.setFont(axisFont);
-    painter.setPen(QPen(Qt::black));
-    
-    // Подпись оси X
-    QRectF xLabelRect(plotArea.left(), plotArea.bottom() + 50, plotArea.width(), 25);
-    painter.drawText(xLabelRect, Qt::AlignCenter, "Date/Time");
-    
-    // ЛЕВАЯ ось Y
-    QRectF tempLabelRect(10, plotArea.top(), 40, plotArea.height());
-    painter.drawText(tempLabelRect, Qt::AlignCenter, "T °C");
-    
-    // ПРАВАЯ ось Y
-    QRectF humLabelRect(plotArea.right() + 50, plotArea.top(), 40, plotArea.height());
-    painter.drawText(humLabelRect, Qt::AlignCenter, "H %");
-    
-    // === ЛЕГЕНДА ===
-    painter.setFont(legendFont);
-    
-    QFontMetrics legendFM(legendFont);
-    QString tempText = useColor ? "Temperature" : "Temperature (solid)";
-    QString humText = useColor ? "Humidity" : "Humidity (dashed)";
-    
-    QRect tempBounds = legendFM.boundingRect(tempText);
-    QRect humBounds = legendFM.boundingRect(humText);
-    int textWidth = qMax(tempBounds.width(), humBounds.width());
-    
-    int lineLength = qBound(15, int(20 * scale), 35);
-    int legendWidth = lineLength + 10 + textWidth + 15;
-    int legendHeight = (legendFM.height() + 5) * 2 + 15;
-    
-    QRectF legendRect(plotArea.right() - legendWidth - 10, plotArea.top() + 10, 
-                     legendWidth, legendHeight);
-    
-    painter.setPen(QPen(Qt::black, 1));
-    painter.setBrush(QBrush(QColor(255, 255, 255, 240)));
-    painter.drawRect(legendRect);
-    
-    // Элементы легенды
-    double legendY = legendRect.top() + 10;
-    double lineStartX = legendRect.left() + 8;
-    double lineEndX = lineStartX + lineLength;
-    double textX = lineEndX + 6;
-    
-    // Температура
-    if (useColor) {
-        painter.setPen(QPen(Qt::red, lineWidth));
-    } else {
-        painter.setPen(QPen(Qt::black, lineWidth));
-    }
-    painter.drawLine(QPointF(lineStartX, legendY), QPointF(lineEndX, legendY));
-    
-    painter.setPen(QPen(Qt::black));
-    painter.drawText(QPointF(textX, legendY + 4), tempText);
-    
-    // Влажность
-    legendY += legendFM.height() + 5;
-    if (useColor) {
-        painter.setPen(QPen(Qt::blue, lineWidth));
-    } else {
-        painter.setPen(QPen(Qt::black, lineWidth * 0.7, Qt::DashLine));
-    }
-    painter.drawLine(QPointF(lineStartX, legendY), QPointF(lineEndX, legendY));
-    
-    painter.setPen(QPen(Qt::black));
-    painter.drawText(QPointF(textX, legendY + 4), humText);
-    
-    painter.end();
-    
-    DEBUG_LOG("Manual rendering completed with scale:" << scale);
+    showPointsMode = false;
+    showCursor = false;
 }
 
 void MainWindow::loadVisualizationSettings(QSettings& settings) {
     settings.beginGroup("VISUALIZATION");
     
-    // === ЦВЕТА ===
-    QString tempColorStr = settings.value("TemperatureColor", "#FF0000").toString();
-    QString humColorStr = settings.value("HumidityColor", "#0000FF").toString();
-    QString gridColorStr = settings.value("GridColor", "#D3D3D3").toString();
-    QString crosshairColorStr = settings.value("CrosshairColor", "#A9A9A9").toString();
+    // Цвета
+    vizSettings.temperatureColor = QColor(settings.value("TemperatureColor", "#FF0000").toString());
+    vizSettings.humidityColor = QColor(settings.value("HumidityColor", "#0000FF").toString());
+    vizSettings.gridColor = QColor(settings.value("GridColor", "#D3D3D3").toString());
+    vizSettings.crosshairColor = QColor(settings.value("CrosshairColor", "#A9A9A9").toString());
     
-    vizSettings.temperatureColor = QColor(tempColorStr);
-    vizSettings.humidityColor = QColor(humColorStr);
-    vizSettings.gridColor = QColor(gridColorStr);
-    vizSettings.crosshairColor = QColor(crosshairColorStr);
-    
-    // === ТОЛЩИНА ЛИНИЙ ===
+    // Толщина линий
     vizSettings.temperatureLineWidth = settings.value("TemperatureLineWidth", 2).toInt();
     vizSettings.humidityLineWidth = settings.value("HumidityLineWidth", 2).toInt();
     vizSettings.gridLineWidth = settings.value("GridLineWidth", 1).toInt();
     vizSettings.crosshairLineWidth = settings.value("CrosshairLineWidth", 1).toInt();
     
-    // === СГЛАЖИВАНИЕ ===
+    // Сглаживание
     vizSettings.smoothingWindow = settings.value("SmoothingWindow", 5).toInt();
     vizSettings.enableSmoothing = settings.value("EnableSmoothing", true).toBool();
     
-    // === РАЗМЕРЫ ТОЧЕК ===
+    // Размеры и прозрачность
     vizSettings.pointSize = settings.value("PointSize", 4).toInt();
-    
-    // === ПРОЗРАЧНОСТЬ ===
     vizSettings.gridOpacity = settings.value("GridOpacity", 255).toInt();
     vizSettings.crosshairOpacity = settings.value("CrosshairOpacity", 200).toInt();
     
     settings.endGroup();
     
-    DEBUG_LOG("Loaded visualization settings:");
-    DEBUG_LOG("Temperature color:" << vizSettings.temperatureColor.name());
-    DEBUG_LOG("Humidity color:" << vizSettings.humidityColor.name());
-    DEBUG_LOG("Smoothing window:" << vizSettings.smoothingWindow);    // ДОБАВИТЬ
-    DEBUG_LOG("Enable smoothing:" << vizSettings.enableSmoothing);    // ДОБАВИТЬ
+    DEBUG_LOG("Loaded visualization settings from config");
 }
 
 void MainWindow::loadDefaultVisualizationSettings() {
-    // Установить значения по умолчанию
     vizSettings.temperatureColor = Qt::red;
     vizSettings.humidityColor = Qt::blue;
     vizSettings.gridColor = Qt::lightGray;
     vizSettings.crosshairColor = Qt::darkGray;
-    
     vizSettings.temperatureLineWidth = 2;
     vizSettings.humidityLineWidth = 2;
     vizSettings.gridLineWidth = 1;
     vizSettings.crosshairLineWidth = 1;
-    
     vizSettings.smoothingWindow = 5;
     vizSettings.enableSmoothing = true;
-    
     vizSettings.pointSize = 4;
-    
     vizSettings.gridOpacity = 255;
     vizSettings.crosshairOpacity = 200;
     
@@ -2043,26 +1379,652 @@ void MainWindow::loadDefaultVisualizationSettings() {
 void MainWindow::applyVisualizationSettings() {
     if (!customPlot) return;
     
-    // Применить настройки к графикам температуры
-    QPen tempPen(vizSettings.temperatureColor, vizSettings.temperatureLineWidth, Qt::SolidLine);
-    customPlot->graph(0)->setPen(tempPen);
+    // Применить цвета и стили к графикам
+    if (customPlot->graphCount() >= 2) {
+        // График температуры
+        QPen tempPen(vizSettings.temperatureColor, vizSettings.temperatureLineWidth, Qt::SolidLine);
+        customPlot->graph(0)->setPen(tempPen);
+        
+        // График влажности
+        QPen humPen(vizSettings.humidityColor, vizSettings.humidityLineWidth, Qt::SolidLine);
+        customPlot->graph(1)->setPen(humPen);
+    }
     
-    // Применить настройки к графикам влажности
-    QPen humPen(vizSettings.humidityColor, vizSettings.humidityLineWidth, Qt::SolidLine);
-    customPlot->graph(1)->setPen(humPen);
+    // Применить настройки сетки
+    QPen gridPen(vizSettings.gridColor, vizSettings.gridLineWidth, Qt::DotLine);
+    customPlot->xAxis->grid()->setPen(gridPen);
+    customPlot->yAxis->grid()->setPen(gridPen);
+    customPlot->yAxis2->grid()->setPen(gridPen);
     
-    // Применить настройки к курсору
-    QColor crosshairColor = vizSettings.crosshairColor;
-    crosshairColor.setAlpha(vizSettings.crosshairOpacity);
-    crossHairV->setPen(QPen(crosshairColor, vizSettings.crosshairLineWidth, Qt::DashLine));
-    crossHairH->setPen(QPen(crosshairColor, vizSettings.crosshairLineWidth, Qt::DashLine));
+    // Применить настройки курсора
+    QColor crosshairColorWithAlpha = vizSettings.crosshairColor;
+    crosshairColorWithAlpha.setAlpha(vizSettings.crosshairOpacity);
+    QPen crosshairPen(crosshairColorWithAlpha, vizSettings.crosshairLineWidth, Qt::DashLine);
     
-    // Применить настройки к сетке
-    QColor gridColor = vizSettings.gridColor;
-    gridColor.setAlpha(vizSettings.gridOpacity);
-    customPlot->xAxis->grid()->setPen(QPen(gridColor, vizSettings.gridLineWidth));
-    customPlot->yAxis->grid()->setPen(QPen(gridColor, vizSettings.gridLineWidth));
+    if (crossHairV && crossHairH) {
+        crossHairV->setPen(crosshairPen);
+        crossHairH->setPen(crosshairPen);
+    }
     
-    DEBUG_LOG("Applied visualization settings to chart");
+    DEBUG_LOG("Applied visualization settings");
+}
+
+void MainWindow::hideCrosshair() {
+    if (crossHairV) crossHairV->setVisible(false);
+    if (crossHairH) crossHairH->setVisible(false);
+    if (valueLabel) valueLabel->setVisible(false);
+    customPlot->replot();
+}
+
+void MainWindow::updateCrosshair(double x, double y) {
+    if (!crossHairV || !crossHairH || !valueLabel) return;
+    
+    // Показать линии курсора
+    crossHairV->start->setCoords(x, customPlot->yAxis->range().lower);
+    crossHairV->end->setCoords(x, customPlot->yAxis->range().upper);
+    crossHairH->start->setCoords(customPlot->xAxis->range().lower, y);
+    crossHairH->end->setCoords(customPlot->xAxis->range().upper, y);
+    
+    crossHairV->setVisible(true);
+    crossHairH->setVisible(true);
+    
+    // Показать значения в метке
+    QString valueText = formatValueAtPosition(x);
+    valueLabel->setText(valueText);
+    valueLabel->position->setCoords(x, y);
+    valueLabel->setVisible(true);
+    
+    customPlot->replot();
+}
+
+QString MainWindow::formatValueAtPosition(double timePos) {
+    QDateTime dt = QDateTime::fromSecsSinceEpoch(timePos);
+    
+    // Найти ближайшую точку данных
+    if (originalData.isEmpty()) return "";
+    
+    DataPoint closestPoint = originalData.first();
+    double minDistance = qAbs(closestPoint.timestamp.toSecsSinceEpoch() - timePos);
+    
+    for (const DataPoint& point : originalData) {
+        double distance = qAbs(point.timestamp.toSecsSinceEpoch() - timePos);
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestPoint = point;
+        }
+    }
+    
+    // ИСПРАВИТЬ: убрать .status поскольку его нет в DataPoint
+    return QString("Time: %1\nTemp: %2°C\nHum: %3%")
+        .arg(dt.toString("dd.MM.yyyy hh:mm:ss"))
+        .arg(closestPoint.temperature, 0, 'f', 1)
+        .arg(closestPoint.humidity, 0, 'f', 1);
+}
+
+void MainWindow::updateStatusStats() {
+    if (originalData.isEmpty()) return;
+    
+    QCPRange xRange = customPlot->xAxis->range();
+    QDateTime startTime = QDateTime::fromSecsSinceEpoch(xRange.lower);
+    QDateTime endTime = QDateTime::fromSecsSinceEpoch(xRange.upper);
+    
+    QString statsText = QString("Viewing: %1 to %2")
+        .arg(startTime.toString("dd.MM.yyyy hh:mm"))
+        .arg(endTime.toString("dd.MM.yyyy hh:mm"));
+    
+    statusBar()->showMessage(statsText, 0);
+}
+
+void MainWindow::setTimeScale(TimeScale scale) {
+    currentTimeScale = scale;
+    
+    QString scaleText;
+    switch (scale) {
+    case Day: scaleText = "Day scale"; break;
+    case Week: scaleText = "Week scale"; break;
+    case Month: scaleText = "Month scale"; break;
+    }
+    
+    statusBar()->showMessage(scaleText, 2000);
+}
+
+void MainWindow::navigateTime(int direction) {
+    if (originalData.isEmpty()) return;
+    
+    QCPRange range = customPlot->xAxis->range();
+    double step;
+    
+    switch (currentTimeScale) {
+    case Day: step = 3600; break;      // 1 час
+    case Week: step = 86400; break;    // 1 день  
+    case Month: step = 604800; break;  // 1 неделя
+    }
+    
+    step *= direction;
+    customPlot->xAxis->setRange(range.lower + step, range.upper + step);
+    customPlot->replot();
+    updateStatusStats();
+}
+
+// Методы для множественных графиков
+void MainWindow::addFileToChart() {
+    QString lastDir = getLastDirectory();
+    QString filePath = QFileDialog::getOpenFileName(this,
+        "Add CSV File to Chart", lastDir,
+        "CSV files (*.csv);;All files (*.*)");
+        
+    if (filePath.isEmpty()) return;
+    
+    setLastDirectory(QFileInfo(filePath).absolutePath());
+    
+    // ИСПРАВИТЬ: если есть данные в старой системе, перенести их в новую
+    if (dataSets.isEmpty() && !originalData.isEmpty()) {
+        // Первое добавление - нужно перенести существующий файл в dataSets
+        QString existingFileName = currentFilePath.isEmpty() ? "Existing data" : QFileInfo(currentFilePath).fileName();
+        addDataSet(originalData, rawData, existingFileName);
+        
+        // Переключиться в режим наложения
+        overlayMode = true;
+        
+        DEBUG_LOG("Moved existing data to dataSets, now adding new file");
+    }
+    
+    // Загрузить данные в режиме наложения
+    overlayMode = true;
+    loadFileData(filePath, true);
+}
+
+void MainWindow::clearAllGraphs() {
+    // Очистить новую систему
+    dataSets.clear();
+    currentDataSetIndex = -1;
+    overlayMode = false;
+    
+    // Очистить старые переменные
+    originalData.clear();
+    rawData.clear();
+    
+    // ИСПРАВИТЬ: полностью очистить и восстановить графики
+    customPlot->clearGraphs();
+    customPlot->clearItems(); // Очистить все элементы включая линии сетки
+    
+    // Восстановить базовые графики как в setupUI()
+    customPlot->addGraph(customPlot->xAxis, customPlot->yAxis);
+    customPlot->graph(0)->setName("Temperature");
+    customPlot->addGraph(customPlot->xAxis, customPlot->yAxis2);
+    customPlot->graph(1)->setName("Humidity");
+    
+    // Восстановить курсор
+    crossHairV = new QCPItemLine(customPlot);
+    crossHairH = new QCPItemLine(customPlot);
+    valueLabel = new QCPItemText(customPlot);
+    
+    valueLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignRight);
+    valueLabel->setPadding(QMargins(5, 5, 5, 5));
+    valueLabel->setBrush(QBrush(QColor(255, 255, 255, 200)));
+    valueLabel->setPen(QPen(Qt::black));
+    
+    hideCrosshair();
+    
+    // Применить настройки визуализации
+    applyVisualizationSettings();
+    
+    // Сбросить режимы
+    showPointsMode = false;
+    showCursor = false;
+    
+    customPlot->replot();
+    
+    setWindowTitle("HT View - Temperature/Humidity Plotter");
+    statusBar()->showMessage("All datasets cleared", 2000);
+}
+
+void MainWindow::loadFileData(const QString& filePath, bool addToExisting) {
+    // ИСПРАВИТЬ: сохранить зум только при добавлении к существующим данным
+    QCPRange savedXRange, savedYRange, savedY2Range;
+    bool preserveZoom = addToExisting && (!dataSets.isEmpty() || !originalData.isEmpty());
+    
+    if (preserveZoom) {
+        savedXRange = customPlot->xAxis->range();
+        savedYRange = customPlot->yAxis->range();
+        savedY2Range = customPlot->yAxis2->range();
+    }
+    
+    // ИСПРАВИТЬ: НЕ очищать при добавлении
+    if (!addToExisting) {
+        clearAllGraphs();
+        currentFilePath = filePath;
+        updateWindowTitle(filePath);
+    }
+    
+    progressDialog = new QProgressDialog(
+        addToExisting ? "Adding CSV file to chart..." : "Loading CSV file...", 
+        "Cancel", 0, 100, this);
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->show();
+    progressDialog->setValue(10);
+    
+    QTimer::singleShot(50, [this, filePath, addToExisting, preserveZoom, savedXRange, savedYRange, savedY2Range]() {
+        progressDialog->setValue(30);
+        progressDialog->setLabelText("Parsing CSV...");
+        QCoreApplication::processEvents();
+        
+        CSVParser parser;
+        QString pattern = loadParserPattern();
+        parser.setPattern(pattern);
+        QVector<DataPoint> data = parser.parseFile(filePath);
+        
+        progressDialog->setValue(70);
+        QCoreApplication::processEvents();
+        
+        if (data.isEmpty()) {
+            progressDialog->close();
+            QMessageBox::warning(this, "Error", "No data found");
+            return;
+        }
+        
+        // Сохранить исходные данные
+        QVector<DataPoint> rawDataSet = data;
+        
+        progressDialog->setLabelText("Smoothing data...");
+        
+        // Применить сглаживание
+        QVector<DataPoint> smoothedData;
+        if (vizSettings.enableSmoothing) {
+            smoothedData = smoothData(data, vizSettings.smoothingWindow);
+        } else {
+            smoothedData = data;
+        }
+        
+        if (addToExisting) {
+            // ИСПРАВИТЬ: добавляем к существующим данным через новую систему
+            addDataSet(smoothedData, rawDataSet, QFileInfo(filePath).fileName());
+            
+            progressDialog->setValue(90);
+            progressDialog->setLabelText("Creating plot...");
+            QCoreApplication::processEvents();
+            
+            // Обновить через новую систему множественных графиков
+            updateAllGraphs();
+        } else {
+            // ИСПРАВИТЬ: загрузка одного файла через старую систему
+            this->originalData = smoothedData;
+            this->rawData = rawDataSet;
+            
+            progressDialog->setValue(90);
+            progressDialog->setLabelText("Creating plot...");
+            QCoreApplication::processEvents();
+            
+            // Использовать старую систему отображения
+            plotData(smoothedData);
+        }
+        
+        // ДОБАВИТЬ: восстановить зум если нужно
+        if (preserveZoom) {
+            customPlot->xAxis->setRange(savedXRange);
+            customPlot->yAxis->setRange(savedYRange);
+            customPlot->yAxis2->setRange(savedY2Range);
+            updateTemperatureGrid();
+            customPlot->replot();
+        }
+        
+        progressDialog->setValue(100);
+        progressDialog->close();
+        progressDialog = nullptr;
+        
+        // Обновить заголовок окна
+        if (addToExisting && dataSets.size() > 1) {
+            setWindowTitle(QString("HT View - %1 datasets").arg(dataSets.size()));
+        } else if (!addToExisting) {
+            updateWindowTitle(filePath);
+        }
+    });
+}
+
+void MainWindow::addDataSet(const QVector<DataPoint>& originalData, 
+                           const QVector<DataPoint>& rawData, 
+                           const QString& fileName) {
+    DataSet newDataSet;
+    newDataSet.originalData = originalData;
+    newDataSet.rawData = rawData;
+    newDataSet.fileName = fileName;
+    
+    // Генерировать цвета для наложения
+    generateOverlayColors(dataSets.size(), newDataSet.tempColor, newDataSet.humColor);
+    
+    dataSets.append(newDataSet);
+    currentDataSetIndex = dataSets.size() - 1;
+    
+    // Для совместимости со старым кодом
+    if (dataSets.size() == 1) {
+        this->originalData = originalData;
+        this->rawData = rawData;
+    }
+}
+
+void MainWindow::generateOverlayColors(int index, QColor& tempColor, QColor& humColor) {
+    if (index == 0) {
+        // Первый набор - стандартные цвета (полная насыщенность)
+        tempColor = vizSettings.temperatureColor;
+        humColor = vizSettings.humidityColor;
+    } else {
+        // ИСПРАВИТЬ: использовать базовые цвета с уменьшением насыщенности
+        QColor baseTempColor = vizSettings.temperatureColor;
+        QColor baseHumColor = vizSettings.humidityColor;
+        
+        // Рассчитать коэффициент уменьшения насыщенности
+        // index 1 = 70%, index 2 = 50%, index 3 = 30%, и т.д.
+        double saturationFactor = qMax(0.3, 1.0 - (index * 0.2));
+        int alphaValue = qMax(100, static_cast<int>(255 * saturationFactor));
+        
+        // Температура - сохранить оттенок, уменьшить насыщенность
+        tempColor = baseTempColor;
+        tempColor.setAlpha(alphaValue);
+        
+        // Влажность - сохранить оттенок, уменьшить насыщенность  
+        humColor = baseHumColor;
+        humColor.setAlpha(alphaValue);
+        
+        // Дополнительно: слегка изменить оттенок для четкого различия
+        if (index > 1) {
+            int hueShift = (index - 1) * 15; // сдвиг на 15° для каждого последующего
+            
+            int tempHue = (tempColor.hue() + hueShift) % 360;
+            tempColor.setHsv(tempHue, tempColor.saturation(), tempColor.value(), alphaValue);
+            
+            int humHue = (humColor.hue() + hueShift) % 360;
+            humColor.setHsv(humHue, humColor.saturation(), humColor.value(), alphaValue);
+        }
+    }
+}
+
+void MainWindow::updateAllGraphs() {
+    if (dataSets.isEmpty()) return;
+    
+    // ИСПРАВИТЬ: правильная проверка существующего диапазона
+    bool hasExistingRange = customPlot->graphCount() > 0 && !originalData.isEmpty();
+    QCPRange savedXRange, savedYRange, savedY2Range;
+    if (hasExistingRange) {
+        savedXRange = customPlot->xAxis->range();
+        savedYRange = customPlot->yAxis->range();
+        savedY2Range = customPlot->yAxis2->range();
+    }
+    
+    // Очистить существующие графики
+    customPlot->clearGraphs();
+    
+    // Создать графики для каждого набора данных
+    for (int i = 0; i < dataSets.size(); ++i) {
+        const DataSet& dataSet = dataSets[i];
+        if (!dataSet.visible) continue;
+        
+        // Выбрать данные в зависимости от режима отображения
+        const QVector<DataPoint>& dataToUse = showPointsMode ? dataSet.rawData : dataSet.originalData;
+        
+        if (dataToUse.isEmpty()) continue;
+        
+        // Подготовить данные для графиков
+        QVector<double> timeData, tempData, humData;
+        for (const DataPoint& point : dataToUse) {
+            timeData.append(point.timestamp.toSecsSinceEpoch());
+            tempData.append(point.temperature);
+            humData.append(point.humidity);
+        }
+        
+        // Создать график температуры
+        customPlot->addGraph(customPlot->xAxis, customPlot->yAxis);
+        int tempGraphIndex = customPlot->graphCount() - 1;
+        customPlot->graph(tempGraphIndex)->setData(timeData, tempData);
+        customPlot->graph(tempGraphIndex)->setName(QString("Temperature (%1)").arg(dataSet.fileName));
+        
+        // ДОБАВИТЬ: настроить декоратор выделения для температуры
+        QCPSelectionDecorator *tempDecorator = new QCPSelectionDecorator;
+        tempDecorator->setPen(QPen(Qt::yellow, 4));
+        tempDecorator->setBrush(QBrush(Qt::yellow, Qt::Dense6Pattern));
+        customPlot->graph(tempGraphIndex)->setSelectionDecorator(tempDecorator);
+        
+        // Создать график влажности  
+        customPlot->addGraph(customPlot->xAxis, customPlot->yAxis2);
+        int humGraphIndex = customPlot->graphCount() - 1;
+        customPlot->graph(humGraphIndex)->setData(timeData, humData);
+        customPlot->graph(humGraphIndex)->setName(QString("Humidity (%1)").arg(dataSet.fileName));
+        
+        // ДОБАВИТЬ: настроить декоратор выделения для влажности
+        QCPSelectionDecorator *humDecorator = new QCPSelectionDecorator;
+        humDecorator->setPen(QPen(Qt::cyan, 4));
+        humDecorator->setBrush(QBrush(Qt::cyan, Qt::Dense6Pattern));
+        customPlot->graph(humGraphIndex)->setSelectionDecorator(humDecorator);
+        
+        // Применить стили
+        if (showPointsMode) {
+            // Режим точек
+            customPlot->graph(tempGraphIndex)->setLineStyle(QCPGraph::lsNone);
+            customPlot->graph(tempGraphIndex)->setScatterStyle(
+                QCPScatterStyle(QCPScatterStyle::ssCircle, dataSet.tempColor, dataSet.tempColor, vizSettings.pointSize));
+                
+            customPlot->graph(humGraphIndex)->setLineStyle(QCPGraph::lsNone);
+            customPlot->graph(humGraphIndex)->setScatterStyle(
+                QCPScatterStyle(QCPScatterStyle::ssCircle, dataSet.humColor, dataSet.humColor, vizSettings.pointSize));
+        } else {
+            // Режим линий
+            QPen tempPen(dataSet.tempColor, vizSettings.temperatureLineWidth, Qt::SolidLine);
+            customPlot->graph(tempGraphIndex)->setPen(tempPen);
+            customPlot->graph(tempGraphIndex)->setLineStyle(QCPGraph::lsLine);
+            
+            QPen humPen(dataSet.humColor, vizSettings.humidityLineWidth, Qt::SolidLine);
+            customPlot->graph(humGraphIndex)->setPen(humPen);
+            customPlot->graph(humGraphIndex)->setLineStyle(QCPGraph::lsLine);
+        }
+    }
+    
+    // ИЗМЕНИТЬ: восстановить зум или автомасштабировать
+    if (hasExistingRange) {
+        // Восстановить сохраненные диапазоны
+        customPlot->xAxis->setRange(savedXRange);
+        customPlot->yAxis->setRange(savedYRange);
+        customPlot->yAxis2->setRange(savedY2Range);
+       } else {
+        // Автомасштабирование только для первой загрузки
+        customPlot->rescaleAxes();
+    }
+    
+    updateTemperatureGrid();
+    customPlot->replot();
+}
+
+// Методы печати и экспорта (пустые заглушки для компиляции)
+void MainWindow::printChart() {
+    QMessageBox::information(this, "Print", "Print functionality not implemented yet");
+}
+
+void MainWindow::printPreview() {
+    QMessageBox::information(this, "Print Preview", "Print preview functionality not implemented yet");
+}
+
+void MainWindow::copyChartToClipboard() {
+    QMessageBox::information(this, "Copy", "Copy to clipboard functionality not implemented yet");
+}
+
+void MainWindow::exportChart() {
+    QMessageBox::information(this, "Export", "Export functionality not implemented yet");
+}
+
+void MainWindow::deleteSelectedGraphs() {
+    if (!dataSets.isEmpty()) {
+        // Новая система множественных графиков
+        deleteSelectedFromDataSets();
+    } else if (!originalData.isEmpty()) {
+        // Старая система одного файла
+        deleteSelectedFromSingleFile();
+    }
+}
+
+void MainWindow::deleteSelectedFromDataSets() {
+    if (dataSets.isEmpty()) return;
+    
+    QList<int> graphsToDelete;
+    QStringList deletedFileNames;
+    
+    // Найти выделенные графики
+    for (int i = 0; i < customPlot->graphCount(); ++i) {
+        if (customPlot->graph(i)->selected()) {
+            graphsToDelete.append(i);
+        }
+    }
+    
+    if (graphsToDelete.isEmpty()) {
+        statusBar()->showMessage("No graphs selected for deletion", 2000);
+        return;
+    }
+    
+    // Определить какие наборы данных нужно удалить
+    QSet<int> dataSetsToDelete;
+    for (int graphIndex : graphsToDelete) {
+        // Каждый набор данных создает 2 графика (temp + humidity)
+        int dataSetIndex = graphIndex / 2;
+        if (dataSetIndex < dataSets.size()) {
+            dataSetsToDelete.insert(dataSetIndex);
+            deletedFileNames.append(dataSets[dataSetIndex].fileName);
+        }
+    }
+    
+    // Подтверждение удаления
+    if (dataSetsToDelete.size() > 1) {
+        int ret = QMessageBox::question(this, "Delete Datasets",
+            QString("Delete %1 selected datasets?\n\nFiles:\n%2")
+                .arg(dataSetsToDelete.size())
+                .arg(deletedFileNames.join("\n")),
+            QMessageBox::Yes | QMessageBox::No);
+        if (ret != QMessageBox::Yes) return;
+    } else if (dataSetsToDelete.size() == 1) {
+        int ret = QMessageBox::question(this, "Delete Dataset",
+            QString("Delete dataset: %1?").arg(deletedFileNames.first()),
+            QMessageBox::Yes | QMessageBox::No);
+        if (ret != QMessageBox::Yes) return;
+    }
+    
+    // Сохранить зум
+    QCPRange savedXRange = customPlot->xAxis->range();
+    QCPRange savedYRange = customPlot->yAxis->range();
+    QCPRange savedY2Range = customPlot->yAxis2->range();
+    
+    // Удалить наборы данных (в обратном порядке чтобы индексы не сбивались)
+    QList<int> sortedIndexes = dataSetsToDelete.values();
+    std::sort(sortedIndexes.rbegin(), sortedIndexes.rend());
+    
+    for (int index : sortedIndexes) {
+        dataSets.removeAt(index);
+    }
+    
+    // Проверить что осталось
+    if (dataSets.isEmpty()) {
+        // Все удалили - вернуться к одиночному режиму
+        overlayMode = false;
+        originalData.clear();
+        rawData.clear();
+        currentDataSetIndex = -1;
+        
+        customPlot->clearGraphs();
+        
+        // Восстановить базовые графики
+        customPlot->addGraph(customPlot->xAxis, customPlot->yAxis);
+        customPlot->graph(0)->setName("Temperature");
+        customPlot->addGraph(customPlot->xAxis, customPlot->yAxis2);
+        customPlot->graph(1)->setName("Humidity");
+        
+        // Восстановить курсор
+        crossHairV = new QCPItemLine(customPlot);
+        crossHairH = new QCPItemLine(customPlot);
+        valueLabel = new QCPItemText(customPlot);
+        
+        valueLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignRight);
+        valueLabel->setPadding(QMargins(5, 5, 5, 5));
+        valueLabel->setBrush(QBrush(QColor(255, 255, 255, 200)));
+        valueLabel->setPen(QPen(Qt::black));
+        
+        hideCrosshair();
+        
+        // Применить настройки визуализации
+        applyVisualizationSettings();
+        
+        // Сбросить режимы
+        showPointsMode = false;
+        showCursor = false;
+        
+        customPlot->replot();
+        
+        setWindowTitle("HT View - Temperature/Humidity Plotter");
+        statusBar()->showMessage("All datasets deleted", 2000);
+    } else {
+        // Еще есть данные - обновить все графики
+        if (dataSets.size() == 1) {
+            // Остался один набор - можно вернуться к одиночному режиму
+            originalData = dataSets[0].originalData;
+            rawData = dataSets[0].rawData;
+            currentFilePath = dataSets[0].fileName;
+            
+            overlayMode = false;
+            currentDataSetIndex = -1;
+            
+            updateWindowTitle(currentFilePath);
+        }
+        
+        updateAllGraphs();
+        
+        // Восстановить зум
+        customPlot->xAxis->setRange(savedXRange);
+        customPlot->yAxis->setRange(savedYRange);
+        customPlot->yAxis2->setRange(savedY2Range);
+        
+        updateTemperatureGrid();
+        customPlot->replot();
+        
+        // Обновить заголовок
+        if (dataSets.size() > 1) {
+            setWindowTitle(QString("HT View - %1 datasets").arg(dataSets.size()));
+        }
+        
+        statusBar()->showMessage(
+            QString("Deleted %1 dataset(s), %2 remaining")
+                .arg(deletedFileNames.size())
+                .arg(dataSets.size()), 3000);
+    }
+}
+
+void MainWindow::deleteSelectedFromSingleFile() {
+    // В режиме одного файла можем только скрыть графики
+    bool tempSelected = false;
+    bool humSelected = false;
+    
+    if (customPlot->graphCount() >= 2) {
+        tempSelected = customPlot->graph(0)->selected();
+        humSelected = customPlot->graph(1)->selected();
+    }
+    
+    if (!tempSelected && !humSelected) {
+        statusBar()->showMessage("No graphs selected for deletion", 2000);
+        return;
+    }
+    
+    QStringList toHide;
+    if (tempSelected) toHide << "Temperature";
+    if (humSelected) toHide << "Humidity";
+    
+    int ret = QMessageBox::question(this, "Hide Graphs",
+        QString("Hide selected graphs: %1?\n\n(Use T/H keys to show them again)")
+            .arg(toHide.join(", ")),
+        QMessageBox::Yes | QMessageBox::No);
+    
+    if (ret == QMessageBox::Yes) {
+        if (tempSelected && customPlot->graphCount() >= 1) {
+            customPlot->graph(0)->setVisible(false);
+        }
+        if (humSelected && customPlot->graphCount() >= 2) {
+            customPlot->graph(1)->setVisible(false);
+        }
+        
+        customPlot->replot();
+        statusBar()->showMessage("Selected graphs hidden (use T/H to show)", 3000);
+    }
 }
 

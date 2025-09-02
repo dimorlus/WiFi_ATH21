@@ -24,7 +24,7 @@ events:
       The output was:
       0
       MSBuild version 17.13.19+0d9f5a35a for .NET Framework
-      Build started 29-Aug-25 10:54:02.
+      Build started 02-Sep-25 09:07:14.
       
       Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\3.27.6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -62,7 +62,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:01.65
+      Time Elapsed 00:00:02.55
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -81,8 +81,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-vz7f22"
-      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-vz7f22"
+      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-cyje4n"
+      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-cyje4n"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -91,49 +91,49 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-vz7f22'
+        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-cyje4n'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_43fe4.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_fb5cd.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.13.19+0d9f5a35a for .NET Framework
-        Build started 29-Aug-25 10:54:04.
+        Build started 02-Sep-25 09:07:18.
         
-        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vz7f22\\cmTC_43fe4.vcxproj" on node 1 (default targets).
+        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cyje4n\\cmTC_fb5cd.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_43fe4.dir\\Debug\\".
+          Creating directory "cmTC_fb5cd.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vz7f22\\Debug\\".
-          Creating directory "cmTC_43fe4.dir\\Debug\\cmTC_43fe4.tlog\\".
+          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cyje4n\\Debug\\".
+          Creating directory "cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_43fe4.dir\\Debug\\cmTC_43fe4.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_43fe4.dir\\Debug\\cmTC_43fe4.tlog\\unsuccessfulbuild".
+          Creating "cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.tlog\\unsuccessfulbuild".
         VcpkgTripletSelection:
           Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
           Using normalized configuration "Release"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_43fe4.dir\\Debug\\\\" /Fd"cmTC_43fe4.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.27\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_fb5cd.dir\\Debug\\\\" /Fd"cmTC_fb5cd.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.27\\Modules\\CMakeCXXCompilerABI.cpp"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.43.34810 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_43fe4.dir\\Debug\\\\" /Fd"cmTC_43fe4.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.27\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_fb5cd.dir\\Debug\\\\" /Fd"cmTC_fb5cd.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.27\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vz7f22\\Debug\\cmTC_43fe4.exe" /INCREMENTAL /ILK:"cmTC_43fe4.dir\\Debug\\cmTC_43fe4.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-vz7f22/Debug/cmTC_43fe4.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-vz7f22/Debug/cmTC_43fe4.lib" /MACHINE:X64  /machine:x64 cmTC_43fe4.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_43fe4.vcxproj -> D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vz7f22\\Debug\\cmTC_43fe4.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cyje4n\\Debug\\cmTC_fb5cd.exe" /INCREMENTAL /ILK:"cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-cyje4n/Debug/cmTC_fb5cd.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-cyje4n/Debug/cmTC_fb5cd.lib" /MACHINE:X64  /machine:x64 cmTC_fb5cd.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_fb5cd.vcxproj -> D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cyje4n\\Debug\\cmTC_fb5cd.exe
         AppLocalFromInstalled:
-          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vz7f22\\Debug\\cmTC_43fe4.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_43fe4.dir\\Debug\\cmTC_43fe4.tlog\\cmTC_43fe4.write.1u.tlog" "cmTC_43fe4.dir\\Debug\\vcpkg.applocal.log"
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cyje4n\\Debug\\cmTC_fb5cd.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.tlog\\cmTC_fb5cd.write.1u.tlog" "cmTC_fb5cd.dir\\Debug\\vcpkg.applocal.log"
           'pwsh.exe' is not recognized as an internal or external command,
           operable program or batch file.
-          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vz7f22\\Debug\\cmTC_43fe4.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_43fe4.dir\\Debug\\cmTC_43fe4.tlog\\cmTC_43fe4.write.1u.tlog" "cmTC_43fe4.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
-          "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vz7f22\\Debug\\cmTC_43fe4.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_43fe4.dir\\Debug\\cmTC_43fe4.tlog\\cmTC_43fe4.write.1u.tlog" "cmTC_43fe4.dir\\Debug\\vcpkg.applocal.log"
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cyje4n\\Debug\\cmTC_fb5cd.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.tlog\\cmTC_fb5cd.write.1u.tlog" "cmTC_fb5cd.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cyje4n\\Debug\\cmTC_fb5cd.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.tlog\\cmTC_fb5cd.write.1u.tlog" "cmTC_fb5cd.dir\\Debug\\vcpkg.applocal.log"
         FinalizeBuildStatus:
-          Deleting file "cmTC_43fe4.dir\\Debug\\cmTC_43fe4.tlog\\unsuccessfulbuild".
-          Touching "cmTC_43fe4.dir\\Debug\\cmTC_43fe4.tlog\\cmTC_43fe4.lastbuildstate".
-        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vz7f22\\cmTC_43fe4.vcxproj" (default targets).
+          Deleting file "cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.tlog\\unsuccessfulbuild".
+          Touching "cmTC_fb5cd.dir\\Debug\\cmTC_fb5cd.tlog\\cmTC_fb5cd.lastbuildstate".
+        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cyje4n\\cmTC_fb5cd.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:01.34
+        Time Elapsed 00:00:01.50
         
       exitCode: 0
   -
@@ -151,8 +151,8 @@ events:
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-m9c13s"
-      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-m9c13s"
+      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-my2yyu"
+      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-my2yyu"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -162,43 +162,43 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-m9c13s'
+        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-my2yyu'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_e73ac.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_cb344.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.13.19+0d9f5a35a for .NET Framework
-        Build started 29-Aug-25 10:54:06.
+        Build started 02-Sep-25 09:07:20.
         
-        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\cmTC_e73ac.vcxproj" on node 1 (default targets).
+        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\cmTC_cb344.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_e73ac.dir\\Debug\\".
+          Creating directory "cmTC_cb344.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\Debug\\".
-          Creating directory "cmTC_e73ac.dir\\Debug\\cmTC_e73ac.tlog\\".
+          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\Debug\\".
+          Creating directory "cmTC_cb344.dir\\Debug\\cmTC_cb344.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_e73ac.dir\\Debug\\cmTC_e73ac.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_e73ac.dir\\Debug\\cmTC_e73ac.tlog\\unsuccessfulbuild".
+          Creating "cmTC_cb344.dir\\Debug\\cmTC_cb344.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_cb344.dir\\Debug\\cmTC_cb344.tlog\\unsuccessfulbuild".
         VcpkgTripletSelection:
           Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
           Using normalized configuration "Release"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_e73ac.dir\\Debug\\\\" /Fd"cmTC_e73ac.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\src.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_cb344.dir\\Debug\\\\" /Fd"cmTC_cb344.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\src.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.43.34810 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_e73ac.dir\\Debug\\\\" /Fd"cmTC_e73ac.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\src.cxx"
+          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_cb344.dir\\Debug\\\\" /Fd"cmTC_cb344.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\src.cxx"
           src.cxx
-        D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\cmTC_e73ac.vcxproj]
-        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\cmTC_e73ac.vcxproj" (default targets) -- FAILED.
+        D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\cmTC_cb344.vcxproj]
+        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\cmTC_cb344.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\cmTC_e73ac.vcxproj" (default target) (1) ->
+        "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\cmTC_cb344.vcxproj" (default target) (1) ->
         (ClCompile target) -> 
-          D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m9c13s\\cmTC_e73ac.vcxproj]
+          D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-my2yyu\\cmTC_cb344.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.55
+        Time Elapsed 00:00:00.61
         
       exitCode: 1
   -
@@ -215,8 +215,8 @@ events:
     checks:
       - "Looking for pthread_create in pthreads"
     directories:
-      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-be6q98"
-      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-be6q98"
+      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-99r0l4"
+      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-99r0l4"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -226,45 +226,45 @@ events:
       variable: "CMAKE_HAVE_PTHREADS_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-be6q98'
+        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-99r0l4'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_0c979.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_4c7b9.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.13.19+0d9f5a35a for .NET Framework
-        Build started 29-Aug-25 10:54:07.
+        Build started 02-Sep-25 09:07:21.
         
-        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\cmTC_0c979.vcxproj" on node 1 (default targets).
+        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\cmTC_4c7b9.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_0c979.dir\\Debug\\".
+          Creating directory "cmTC_4c7b9.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\Debug\\".
-          Creating directory "cmTC_0c979.dir\\Debug\\cmTC_0c979.tlog\\".
+          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\Debug\\".
+          Creating directory "cmTC_4c7b9.dir\\Debug\\cmTC_4c7b9.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_0c979.dir\\Debug\\cmTC_0c979.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_0c979.dir\\Debug\\cmTC_0c979.tlog\\unsuccessfulbuild".
+          Creating "cmTC_4c7b9.dir\\Debug\\cmTC_4c7b9.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_4c7b9.dir\\Debug\\cmTC_4c7b9.tlog\\unsuccessfulbuild".
         VcpkgTripletSelection:
           Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
           Using normalized configuration "Release"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_0c979.dir\\Debug\\\\" /Fd"cmTC_0c979.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\CheckFunctionExists.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_4c7b9.dir\\Debug\\\\" /Fd"cmTC_4c7b9.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\CheckFunctionExists.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.43.34810 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_0c979.dir\\Debug\\\\" /Fd"cmTC_0c979.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\CheckFunctionExists.cxx"
+          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_4c7b9.dir\\Debug\\\\" /Fd"cmTC_4c7b9.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\CheckFunctionExists.cxx"
           CheckFunctionExists.cxx
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\Debug\\cmTC_0c979.exe" /INCREMENTAL /ILK:"cmTC_0c979.dir\\Debug\\cmTC_0c979.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib\\manual-link" pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-be6q98/Debug/cmTC_0c979.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-be6q98/Debug/cmTC_0c979.lib" /MACHINE:X64  /machine:x64 cmTC_0c979.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\cmTC_0c979.vcxproj]
-        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\cmTC_0c979.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\Debug\\cmTC_4c7b9.exe" /INCREMENTAL /ILK:"cmTC_4c7b9.dir\\Debug\\cmTC_4c7b9.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib\\manual-link" pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-99r0l4/Debug/cmTC_4c7b9.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-99r0l4/Debug/cmTC_4c7b9.lib" /MACHINE:X64  /machine:x64 cmTC_4c7b9.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\cmTC_4c7b9.vcxproj]
+        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\cmTC_4c7b9.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\cmTC_0c979.vcxproj" (default target) (1) ->
+        "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\cmTC_4c7b9.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-be6q98\\cmTC_0c979.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-99r0l4\\cmTC_4c7b9.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.58
+        Time Elapsed 00:00:00.72
         
       exitCode: 1
   -
@@ -281,8 +281,8 @@ events:
     checks:
       - "Looking for pthread_create in pthread"
     directories:
-      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-t4hb4s"
-      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-t4hb4s"
+      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-p76r5r"
+      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-p76r5r"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -292,45 +292,45 @@ events:
       variable: "CMAKE_HAVE_PTHREAD_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-t4hb4s'
+        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-p76r5r'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_9b615.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_4c224.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.13.19+0d9f5a35a for .NET Framework
-        Build started 29-Aug-25 10:54:08.
+        Build started 02-Sep-25 09:07:22.
         
-        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\cmTC_9b615.vcxproj" on node 1 (default targets).
+        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\cmTC_4c224.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_9b615.dir\\Debug\\".
+          Creating directory "cmTC_4c224.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\Debug\\".
-          Creating directory "cmTC_9b615.dir\\Debug\\cmTC_9b615.tlog\\".
+          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\Debug\\".
+          Creating directory "cmTC_4c224.dir\\Debug\\cmTC_4c224.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_9b615.dir\\Debug\\cmTC_9b615.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_9b615.dir\\Debug\\cmTC_9b615.tlog\\unsuccessfulbuild".
+          Creating "cmTC_4c224.dir\\Debug\\cmTC_4c224.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_4c224.dir\\Debug\\cmTC_4c224.tlog\\unsuccessfulbuild".
         VcpkgTripletSelection:
           Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
           Using normalized configuration "Release"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_9b615.dir\\Debug\\\\" /Fd"cmTC_9b615.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\CheckFunctionExists.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_4c224.dir\\Debug\\\\" /Fd"cmTC_4c224.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\CheckFunctionExists.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.43.34810 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_9b615.dir\\Debug\\\\" /Fd"cmTC_9b615.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\CheckFunctionExists.cxx"
+          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_4c224.dir\\Debug\\\\" /Fd"cmTC_4c224.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\CheckFunctionExists.cxx"
           CheckFunctionExists.cxx
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\Debug\\cmTC_9b615.exe" /INCREMENTAL /ILK:"cmTC_9b615.dir\\Debug\\cmTC_9b615.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib\\manual-link" pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-t4hb4s/Debug/cmTC_9b615.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-t4hb4s/Debug/cmTC_9b615.lib" /MACHINE:X64  /machine:x64 cmTC_9b615.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\cmTC_9b615.vcxproj]
-        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\cmTC_9b615.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\Debug\\cmTC_4c224.exe" /INCREMENTAL /ILK:"cmTC_4c224.dir\\Debug\\cmTC_4c224.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib\\manual-link" pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-p76r5r/Debug/cmTC_4c224.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-p76r5r/Debug/cmTC_4c224.lib" /MACHINE:X64  /machine:x64 cmTC_4c224.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\cmTC_4c224.vcxproj]
+        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\cmTC_4c224.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\cmTC_9b615.vcxproj" (default target) (1) ->
+        "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\cmTC_4c224.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t4hb4s\\cmTC_9b615.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-p76r5r\\cmTC_4c224.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.63
+        Time Elapsed 00:00:00.65
         
       exitCode: 1
   -
@@ -348,8 +348,8 @@ events:
     checks:
       - "Performing Test HAVE_STDATOMIC"
     directories:
-      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-va24ig"
-      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-va24ig"
+      source: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-o8pqxg"
+      binary: "D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-o8pqxg"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -359,49 +359,49 @@ events:
       variable: "HAVE_STDATOMIC"
       cached: true
       stdout: |
-        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-va24ig'
+        Change Dir: 'D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-o8pqxg'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_06854.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Professional/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_01905.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.13.19+0d9f5a35a for .NET Framework
-        Build started 29-Aug-25 10:54:09.
+        Build started 02-Sep-25 09:07:23.
         
-        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\cmTC_06854.vcxproj" on node 1 (default targets).
+        Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\cmTC_01905.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_06854.dir\\Debug\\".
+          Creating directory "cmTC_01905.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\Debug\\".
-          Creating directory "cmTC_06854.dir\\Debug\\cmTC_06854.tlog\\".
+          Creating directory "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\Debug\\".
+          Creating directory "cmTC_01905.dir\\Debug\\cmTC_01905.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_06854.dir\\Debug\\cmTC_06854.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_06854.dir\\Debug\\cmTC_06854.tlog\\unsuccessfulbuild".
+          Creating "cmTC_01905.dir\\Debug\\cmTC_01905.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_01905.dir\\Debug\\cmTC_01905.tlog\\unsuccessfulbuild".
         VcpkgTripletSelection:
           Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
           Using normalized configuration "Release"
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_STDATOMIC /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_06854.dir\\Debug\\\\" /Fd"cmTC_06854.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\src.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_STDATOMIC /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_01905.dir\\Debug\\\\" /Fd"cmTC_01905.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\src.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.43.34810 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_STDATOMIC /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_06854.dir\\Debug\\\\" /Fd"cmTC_06854.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\src.cxx"
+          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_STDATOMIC /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_01905.dir\\Debug\\\\" /Fd"cmTC_01905.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\src.cxx"
           src.cxx
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\Debug\\cmTC_06854.exe" /INCREMENTAL /ILK:"cmTC_06854.dir\\Debug\\cmTC_06854.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-va24ig/Debug/cmTC_06854.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-va24ig/Debug/cmTC_06854.lib" /MACHINE:X64  /machine:x64 cmTC_06854.dir\\Debug\\src.obj
-          cmTC_06854.vcxproj -> D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\Debug\\cmTC_06854.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.43.34808\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\Debug\\cmTC_01905.exe" /INCREMENTAL /ILK:"cmTC_01905.dir\\Debug\\cmTC_01905.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-o8pqxg/Debug/cmTC_01905.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build/CMakeFiles/CMakeScratch/TryCompile-o8pqxg/Debug/cmTC_01905.lib" /MACHINE:X64  /machine:x64 cmTC_01905.dir\\Debug\\src.obj
+          cmTC_01905.vcxproj -> D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\Debug\\cmTC_01905.exe
         AppLocalFromInstalled:
-          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\Debug\\cmTC_06854.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_06854.dir\\Debug\\cmTC_06854.tlog\\cmTC_06854.write.1u.tlog" "cmTC_06854.dir\\Debug\\vcpkg.applocal.log"
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\Debug\\cmTC_01905.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_01905.dir\\Debug\\cmTC_01905.tlog\\cmTC_01905.write.1u.tlog" "cmTC_01905.dir\\Debug\\vcpkg.applocal.log"
           'pwsh.exe' is not recognized as an internal or external command,
           operable program or batch file.
-          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\Debug\\cmTC_06854.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_06854.dir\\Debug\\cmTC_06854.tlog\\cmTC_06854.write.1u.tlog" "cmTC_06854.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
-          "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\Debug\\cmTC_06854.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_06854.dir\\Debug\\cmTC_06854.tlog\\cmTC_06854.write.1u.tlog" "cmTC_06854.dir\\Debug\\vcpkg.applocal.log"
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\Debug\\cmTC_01905.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_01905.dir\\Debug\\cmTC_01905.tlog\\cmTC_01905.write.1u.tlog" "cmTC_01905.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\Debug\\cmTC_01905.exe" "C:\\vcpkg\\installed\\x64-windows\\bin" "cmTC_01905.dir\\Debug\\cmTC_01905.tlog\\cmTC_01905.write.1u.tlog" "cmTC_01905.dir\\Debug\\vcpkg.applocal.log"
         FinalizeBuildStatus:
-          Deleting file "cmTC_06854.dir\\Debug\\cmTC_06854.tlog\\unsuccessfulbuild".
-          Touching "cmTC_06854.dir\\Debug\\cmTC_06854.tlog\\cmTC_06854.lastbuildstate".
-        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-va24ig\\cmTC_06854.vcxproj" (default targets).
+          Deleting file "cmTC_01905.dir\\Debug\\cmTC_01905.tlog\\unsuccessfulbuild".
+          Touching "cmTC_01905.dir\\Debug\\cmTC_01905.tlog\\cmTC_01905.lastbuildstate".
+        Done Building Project "D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\HTview\\HT_view\\build\\CMakeFiles\\CMakeScratch\\TryCompile-o8pqxg\\cmTC_01905.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:01.48
+        Time Elapsed 00:00:01.49
         
       exitCode: 0
 ...

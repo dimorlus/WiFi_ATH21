@@ -21,7 +21,8 @@
     (FileView
       (Path "Design Resources")
       (Path "Design Resources" ".\aht21.dsn")
-      (Path "Design Resources" ".\aht21.dsn" "AHT21"))
+      (Path "Design Resources" ".\aht21.dsn" "AHT21")
+      (Select "Design Resources" ".\aht21.dsn" "AHT21" "AHT21"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")

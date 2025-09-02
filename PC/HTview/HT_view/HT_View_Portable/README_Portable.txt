@@ -23,4 +23,4 @@ Quick Start:
  
 System Requirements: Windows 10/11 64-bit 
 Version: 1.0 
-Total files: 29 
+Total files: 28 
