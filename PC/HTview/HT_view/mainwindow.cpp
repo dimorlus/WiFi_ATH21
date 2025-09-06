@@ -37,6 +37,7 @@
 #include <QPageLayout>      // ДОБАВИТЬ для Qt 6
 #include <QPageSize>        // ДОБАВИТЬ для Qt 6 
 #include <QRegularExpression> // ДОБАВИТЬ для Qt 6
+#include <QPainter>         // ДОБАВИТЬ: для рисования на принтере
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), workerThread(nullptr), csvWorker(nullptr), progressDialog(nullptr)
@@ -683,68 +684,7 @@ void MainWindow::plotData(const QVector<DataPoint>& data) {
     // === 1. НАСТРОЙКА ШКАЛЫ ВРЕМЕНИ (круглые интервалы, дата при смене) ===
 
 if (!timeData.isEmpty()) {
-    QSharedPointer<QCPAxisTickerText> timeTicker(new QCPAxisTickerText);
-    
-    double timeRange = timeData.last() - timeData.first();
-    int timeStepSeconds;
-    
-    // Круглые интервалы времени
-    if (timeRange <= 3600) { // меньше часа - каждые 5 минут
-        timeStepSeconds = 300; // 5 минут
-    } else if (timeRange <= 21600) { // меньше 6 часов - каждые 30 минут
-        timeStepSeconds = 1800; // 30 минут
-    } else if (timeRange <= 86400) { // меньше суток - каждый час
-        timeStepSeconds = 3600; // 1 час
-    } else if (timeRange <= 604800) { // неделя - каждые 4 часа
-        timeStepSeconds = 14400; // 4 часа
-    } else { // больше недели - каждые сутки
-        timeStepSeconds = 86400; // 1 день
-    }
-    
-    // Выровнять начальное время на круглый интервал
-    QDateTime startDT = QDateTime::fromSecsSinceEpoch(timeData.first());
-    QDateTime alignedStart;
-    
-    if (timeStepSeconds < 3600) { // минуты
-        int minutes = (startDT.time().minute() / (timeStepSeconds/60)) * (timeStepSeconds/60);
-        alignedStart = QDateTime(startDT.date(), QTime(startDT.time().hour(), minutes, 0));
-    } else if (timeStepSeconds < 86400) { // часы
-        int hours = (startDT.time().hour() / (timeStepSeconds/3600)) * (timeStepSeconds/3600);
-        alignedStart = QDateTime(startDT.date(), QTime(hours, 0, 0));
-    } else { // дни
-        alignedStart = QDateTime(startDT.date(), QTime(0, 0, 0));
-    }
-    
-    // Генерируем позиции тиков с выровненного времени
-    QString lastDateStr = "";
-    for (qint64 alignedTime = alignedStart.toSecsSinceEpoch(); 
-         alignedTime <= timeData.last(); 
-         alignedTime += timeStepSeconds) {
-        
-        if (alignedTime < timeData.first()) continue;
-        
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(alignedTime);
-        QString currentDateStr = dt.toString("dd.MM.yyyy");
-        QString timeStr = dt.toString("hh:mm");
-        
-        QString label;
-        if (currentDateStr != lastDateStr) {
-            // Дата изменилась - показываем дату и время
-            if (timeRange <= 86400) {
-                label = timeStr; // Для одного дня - только время
-            } else {
-                label = QString("%1\n%2").arg(currentDateStr).arg(timeStr);
-            }
-            lastDateStr = currentDateStr;
-        } else {
-            // Дата та же - только время
-            label = timeStr;
-        }
-        
-        timeTicker->addTick(alignedTime, label);
-    }
-    
-    customPlot->xAxis->setTicker(timeTicker);
+    updateTimeScale(); // ЗАМЕНИТЬ весь блок настройки времени на этот вызов
 } else {
     // Fallback для пустых данных
     QSharedPointer<QCPAxisTickerDateTime> dateTicker(new QCPAxisTickerDateTime);
@@ -802,14 +742,8 @@ customPlot->xAxis->setSubTickLength(0, 3);
     
     customPlot->replot();
     
-    // Показать статистику в статус-баре
-    if (!data.isEmpty()) {
-        QString statsText = QString("Records: %1 | Period: %2 to %3")
-            .arg(data.size())
-            .arg(data.first().timestamp.toString("dd.MM.yyyy hh:mm"))
-            .arg(data.last().timestamp.toString("dd.MM.yyyy hh:mm"));
-        statusBar()->showMessage(statsText, 0);
-    }
+    // ИСПРАВИТЬ: показать детальную статистику вместо простого количества записей
+    updateStatusStats(); // Использовать тот же метод что и для навигации
     
     DEBUG_LOG("Plotted" << data.size() << "data points");
 }
@@ -1159,9 +1093,43 @@ void MainWindow::toggleDisplayMode() {
         // Новая система множественных графиков
         updateAllGraphs();
     } else if (!originalData.isEmpty()) {
-        // Старая система одного файла
+        // Старая система одного файла - ИСПРАВИТЬ: использовать правильные данные
         const QVector<DataPoint>& dataToUse = showPointsMode ? rawData : originalData;
-        plotData(dataToUse);
+        
+        // ИСПРАВИТЬ: обновить только стили графиков, а не перестраивать весь график
+        QVector<double> timeData, tempData, humData;
+        for (const DataPoint& point : dataToUse) {
+            timeData.append(point.timestamp.toSecsSinceEpoch());
+            tempData.append(point.temperature);
+            humData.append(point.humidity);
+        }
+        
+        // Обновить данные
+        customPlot->graph(0)->setData(timeData, tempData);
+        customPlot->graph(1)->setData(timeData, humData);
+        
+        // Применить стили
+        if (showPointsMode) {
+            // Режим точек
+            customPlot->graph(0)->setLineStyle(QCPGraph::lsNone);
+            customPlot->graph(0)->setScatterStyle(
+                QCPScatterStyle(QCPScatterStyle::ssCircle, vizSettings.temperatureColor, vizSettings.temperatureColor, vizSettings.pointSize));
+            
+            customPlot->graph(1)->setLineStyle(QCPGraph::lsNone);
+            customPlot->graph(1)->setScatterStyle(
+                QCPScatterStyle(QCPScatterStyle::ssCircle, vizSettings.humidityColor, vizSettings.humidityColor, vizSettings.pointSize));
+        } else {
+            // Режим линий
+            QPen tempPen(vizSettings.temperatureColor, vizSettings.temperatureLineWidth, Qt::SolidLine);
+            customPlot->graph(0)->setPen(tempPen);
+            customPlot->graph(0)->setLineStyle(QCPGraph::lsLine);
+            customPlot->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
+            
+            QPen humPen(vizSettings.humidityColor, vizSettings.humidityLineWidth, Qt::SolidLine);
+            customPlot->graph(1)->setPen(humPen);
+            customPlot->graph(1)->setLineStyle(QCPGraph::lsLine);
+            customPlot->graph(1)->setScatterStyle(QCPScatterStyle::ssNone);
+        }
     }
     
     // ИСПРАВИТЬ: восстановить зум после обновления
@@ -1178,149 +1146,6 @@ void MainWindow::toggleDisplayMode() {
 }
 
 // ДОБАВИТЬ в конец файла все недостающие методы:
-
-bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
-    if (obj == customPlot) {
-        if (event->type() == QEvent::KeyPress) {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-            
-            // Навигация по времени
-            switch (keyEvent->key()) {
-            case Qt::Key_Left:
-                if (keyEvent->modifiers() & Qt::ShiftModifier) {
-                    panHorizontal(-1);  // Плавный сдвиг влево
-                } else {
-                    navigateTime(-1);   // Обычная навигация
-                }
-                return true;
-                
-            case Qt::Key_Right:
-                if (keyEvent->modifiers() & Qt::ShiftModifier) {
-                    panHorizontal(1);   // Плавный сдвиг вправо
-                } else {
-                    navigateTime(1);    // Обычная навигация
-                }
-                return true;
-                
-            case Qt::Key_Up:
-                if (keyEvent->modifiers() & Qt::ShiftModifier) {
-                    zoomVertical(0.8);  // Увеличить масштаб
-                } else {
-                    panVertical(1);     // Сдвинуть вверх
-                }
-                return true;
-                
-            case Qt::Key_Down:
-                if (keyEvent->modifiers() & Qt::ShiftModifier) {
-                    zoomVertical(1.25); // Уменьшить масштаб
-                } else {
-                    panVertical(-1);    // Сдвинуть вниз
-                }
-                return true;
-                
-            case Qt::Key_PageUp:
-                jumpToPeriodBoundary(-1);
-                return true;
-                
-            case Qt::Key_PageDown:
-                jumpToPeriodBoundary(1);
-                return true;
-                
-            case Qt::Key_Home:
-                if (keyEvent->modifiers() & Qt::ShiftModifier) {
-                    resetAllZoom();
-                } else {
-                    goToStart();
-                }
-                return true;
-                
-            case Qt::Key_End:
-                goToEnd();
-                return true;
-                
-            case Qt::Key_D:
-                setTimeScale(Day);
-                return true;
-                
-            case Qt::Key_W:
-                setTimeScale(Week);
-                return true;
-                
-            case Qt::Key_M:
-                setTimeScale(Month);
-                return true;
-                
-            case Qt::Key_T:
-                toggleTemperatureGraph();
-                return true;
-                
-            case Qt::Key_H:
-                toggleHumidityGraph();
-                return true;
-                
-            case Qt::Key_P:
-                toggleDisplayMode();
-                return true;
-                
-            // ДОБАВИТЬ: удаление выделенных графиков
-            case Qt::Key_Delete:
-                deleteSelectedGraphs();
-                return true;
-            }
-        }
-        
-        if (event->type() == QEvent::Wheel) {
-            QWheelEvent *wheelEvent = static_cast<QWheelEvent*>(event);
-            
-            if (wheelEvent->modifiers() & Qt::ShiftModifier) {
-                // Shift + колесо = вертикальный зум
-                double factor = wheelEvent->angleDelta().y() > 0 ? 0.9 : 1.1;
-                zoomVertical(factor);
-                return true;
-            } else {
-                // Обычное колесо = горизонтальный зум (по времени)
-                QCPRange range = customPlot->xAxis->range();
-                double center = (range.lower + range.upper) / 2.0;
-                double factor = wheelEvent->angleDelta().y() > 0 ? 0.9 : 1.1;
-                double newSize = range.size() * factor;
-                customPlot->xAxis->setRange(center - newSize/2, center + newSize/2);
-                customPlot->replot();
-                updateStatusStats();
-                return true;
-            }
-        }
-        
-        if (event->type() == QEvent::KeyRelease) {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-            if (keyEvent->key() == Qt::Key_Shift) {
-                if (showCursor) {
-                    hideCrosshair();
-                    showCursor = false;
-                }
-                return true;
-            }
-        }
-    }
-    
-    return QMainWindow::eventFilter(obj, event);
-}
-
-void MainWindow::onMouseMove(QMouseEvent* event) {
-    if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-        double x = customPlot->xAxis->pixelToCoord(event->pos().x());
-        double y = customPlot->yAxis->pixelToCoord(event->pos().y());
-        updateCrosshair(x, y);
-        showCursor = true;
-    } else if (showCursor) {
-        hideCrosshair();
-        showCursor = false;
-    }
-}
-
-void MainWindow::onXAxisRangeChanged(const QCPRange &newRange) {
-    updateTemperatureGrid();
-    updateStatusStats();
-}
 
 void MainWindow::setupTimeNavigation() {
     // Инициализация переменных навигации по времени
@@ -1454,7 +1279,6 @@ QString MainWindow::formatValueAtPosition(double timePos) {
         }
     }
     
-    // ИСПРАВИТЬ: убрать .status поскольку его нет в DataPoint
     return QString("Time: %1\nTemp: %2°C\nHum: %3%")
         .arg(dt.toString("dd.MM.yyyy hh:mm:ss"))
         .arg(closestPoint.temperature, 0, 'f', 1)
@@ -1468,11 +1292,62 @@ void MainWindow::updateStatusStats() {
     QDateTime startTime = QDateTime::fromSecsSinceEpoch(xRange.lower);
     QDateTime endTime = QDateTime::fromSecsSinceEpoch(xRange.upper);
     
-    QString statsText = QString("Viewing: %1 to %2")
-        .arg(startTime.toString("dd.MM.yyyy hh:mm"))
-        .arg(endTime.toString("dd.MM.yyyy hh:mm"));
+    // ДОБАВИТЬ: расчет статистики для видимого диапазона
+    QVector<DataPoint> visibleData;
     
-    statusBar()->showMessage(statsText, 0);
+    // ИСПРАВИТЬ: использовать правильные данные в зависимости от системы
+    const QVector<DataPoint>& dataToAnalyze = showPointsMode ? rawData : originalData;
+    
+    // Найти точки данных в видимом диапазоне
+    for (const DataPoint& point : dataToAnalyze) {
+        double pointTime = point.timestamp.toSecsSinceEpoch();
+        if (pointTime >= xRange.lower && pointTime <= xRange.upper) {
+            visibleData.append(point);
+        }
+    }
+    
+    QString statsText;
+    
+    if (visibleData.isEmpty()) {
+        // Нет данных в видимом диапазоне
+        statsText = QString("Viewing: %1 to %2 | No data in range")
+            .arg(startTime.toString("dd.MM.yyyy hh:mm"))
+            .arg(endTime.toString("dd.MM.yyyy hh:mm"));
+    } else {
+        // РАССЧИТАТЬ статистику для видимых данных
+        double tempSum = 0, humSum = 0;
+        double tempMin = visibleData.first().temperature;
+        double tempMax = visibleData.first().temperature;
+        double humMin = visibleData.first().humidity;
+        double humMax = visibleData.first().humidity;
+        
+        for (const DataPoint& point : visibleData) {
+            tempSum += point.temperature;
+            humSum += point.humidity;
+            
+            tempMin = qMin(tempMin, point.temperature);
+            tempMax = qMax(tempMax, point.temperature);
+            humMin = qMin(humMin, point.humidity);
+            humMax = qMax(humMax, point.humidity);
+        }
+        
+        double tempAvg = tempSum / visibleData.size();
+        double humAvg = humSum / visibleData.size();
+        
+        // ФОРМАТ: Время | Количество точек | Средние значения | Диапазоны
+        statsText = QString("Viewing: %1 to %2 | Points: %3 | Temp: %4°C (avg) [%5°C...%6°C] | Hum: %7% (avg) [%8%...%9%]")
+            .arg(startTime.toString("dd.MM.yyyy hh:mm"))
+            .arg(endTime.toString("dd.MM.yyyy hh:mm"))
+            .arg(visibleData.size())
+            .arg(tempAvg, 0, 'f', 1)
+            .arg(tempMin, 0, 'f', 1)
+            .arg(tempMax, 0, 'f', 1)
+            .arg(humAvg, 0, 'f', 1)
+            .arg(humMin, 0, 'f', 1)
+            .arg(humMax, 0, 'f', 1);
+    }
+    
+    statusBar()->showMessage(statsText, 0); // 0 = показывать постоянно
 }
 
 void MainWindow::setTimeScale(TimeScale scale) {
@@ -1486,6 +1361,61 @@ void MainWindow::setTimeScale(TimeScale scale) {
     }
     
     statusBar()->showMessage(scaleText, 2000);
+    
+    // ДОБАВИТЬ: автоматически установить подходящий масштаб времени
+    if (!originalData.isEmpty()) {
+        autoAdjustTimeScale();
+    }
+}
+
+// ДОБАВИТЬ новый метод для автоматической настройки масштаба времени:
+void MainWindow::autoAdjustTimeScale() {
+    if (originalData.isEmpty()) return;
+    
+    // Получить текущий центр экрана
+    QCPRange currentRange = customPlot->xAxis->range();
+    double centerTime = (currentRange.lower + currentRange.upper) / 2.0;
+    
+    // Определить новый размер окна в зависимости от выбранного масштаба
+    double newRangeSize;
+    switch (currentTimeScale) {
+    case Day:
+        newRangeSize = 86400; // 24 часа
+        break;
+    case Week:
+        newRangeSize = 604800; // 7 дней
+        break;
+    case Month:
+        newRangeSize = 2592000; // 30 дней
+        break;
+    }
+    
+    // Установить новый диапазон с центром в текущей позиции
+    double newStart = centerTime - newRangeSize / 2.0;
+    double newEnd = centerTime + newRangeSize / 2.0;
+    
+    // Проверить границы данных
+    double dataStart = originalData.first().timestamp.toSecsSinceEpoch();
+    double dataEnd = originalData.last().timestamp.toSecsSinceEpoch();
+    
+    // Скорректировать если выходим за границы
+    if (newStart < dataStart) {
+        newStart = dataStart;
+        newEnd = qMin(dataStart + newRangeSize, dataEnd);
+    }
+    if (newEnd > dataEnd) {
+        newEnd = dataEnd;
+        newStart = qMax(dataEnd - newRangeSize, dataStart);
+    }
+    
+    // Применить новый диапазон
+    customPlot->xAxis->setRange(newStart, newEnd);
+    
+    // Обновить шкалу времени
+    updateTimeScale();
+    
+    customPlot->replot();
+    updateStatusStats();
 }
 
 void MainWindow::navigateTime(int direction) {
@@ -1823,30 +1753,249 @@ void MainWindow::updateAllGraphs() {
         customPlot->xAxis->setRange(savedXRange);
         customPlot->yAxis->setRange(savedYRange);
         customPlot->yAxis2->setRange(savedY2Range);
-       } else {
+    } else {
         // Автомасштабирование только для первой загрузки
         customPlot->rescaleAxes();
     }
     
     updateTemperatureGrid();
     customPlot->replot();
+    
+    // ДОБАВИТЬ: обновить статистику для множественных графиков
+    if (dataSets.size() > 1) {
+        // Для множественных графиков показать краткую статистику
+        QCPRange xRange = customPlot->xAxis->range();
+        QDateTime startTime = QDateTime::fromSecsSinceEpoch(xRange.lower);
+        QDateTime endTime = QDateTime::fromSecsSinceEpoch(xRange.upper);
+        
+        QString statsText = QString("Viewing: %1 to %2 | %3 datasets loaded")
+            .arg(startTime.toString("dd.MM.yyyy hh:mm"))
+            .arg(endTime.toString("dd.MM.yyyy hh:mm"))
+            .arg(dataSets.size());
+        
+        statusBar()->showMessage(statsText, 0);
+    } else {
+        // Для одного графика использовать детальную статистику
+        updateStatusStats();
+    }
 }
 
-// Методы печати и экспорта (пустые заглушки для компиляции)
-void MainWindow::printChart() {
-    QMessageBox::information(this, "Print", "Print functionality not implemented yet");
+void MainWindow::onMouseMove(QMouseEvent* event) {
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+        double x = customPlot->xAxis->pixelToCoord(event->pos().x());
+        double y = customPlot->yAxis->pixelToCoord(event->pos().y());
+        updateCrosshair(x, y);
+        showCursor = true;
+    } else if (showCursor) {
+        hideCrosshair();
+        showCursor = false;
+    }
 }
 
-void MainWindow::printPreview() {
-    QMessageBox::information(this, "Print Preview", "Print preview functionality not implemented yet");
+void MainWindow::onXAxisRangeChanged(const QCPRange &newRange) {
+    updateTemperatureGrid();
+    updateTimeScale(); // ДОБАВИТЬ: обновлять шкалу времени при изменении диапазона
+    updateStatusStats();
 }
 
-void MainWindow::copyChartToClipboard() {
-    QMessageBox::information(this, "Copy", "Copy to clipboard functionality not implemented yet");
+// ДОБАВИТЬ новый метод для обновления шкалы времени:
+void MainWindow::updateTimeScale() {
+    if (originalData.isEmpty()) return;
+    
+    QCPRange xRange = customPlot->xAxis->range();
+    double timeRange = xRange.upper - xRange.lower;
+    
+    QSharedPointer<QCPAxisTickerText> timeTicker(new QCPAxisTickerText);
+    
+    int timeStepSeconds;
+    
+    // Автоматически выбрать интервал в зависимости от масштаба
+    if (timeRange <= 3600) { // меньше часа - каждые 5 минут
+        timeStepSeconds = 300; // 5 минут
+    } else if (timeRange <= 21600) { // меньше 6 часов - каждые 30 минут
+        timeStepSeconds = 1800; // 30 минут
+    } else if (timeRange <= 86400) { // меньше суток - каждый час
+        timeStepSeconds = 3600; // 1 час
+    } else if (timeRange <= 604800) { // неделя - каждые 4 часа
+        timeStepSeconds = 14400; // 4 часа
+    } else { // больше недели - каждые сутки
+        timeStepSeconds = 86400; // 1 день
+    }
+    
+    // Выровнять начальное время на круглый интервал
+    QDateTime startDT = QDateTime::fromSecsSinceEpoch(xRange.lower);
+    QDateTime alignedStart;
+    
+    if (timeStepSeconds < 3600) { // минуты
+        int minutes = (startDT.time().minute() / (timeStepSeconds/60)) * (timeStepSeconds/60);
+        alignedStart = QDateTime(startDT.date(), QTime(startDT.time().hour(), minutes, 0));
+    } else if (timeStepSeconds < 86400) { // часы
+        int hours = (startDT.time().hour() / (timeStepSeconds/3600)) * (timeStepSeconds/3600);
+        alignedStart = QDateTime(startDT.date(), QTime(hours, 0, 0));
+    } else { // дни
+        alignedStart = QDateTime(startDT.date(), QTime(0, 0, 0));
+    }
+    
+    // Генерируем позиции тиков с выровненного времени
+    QString lastDateStr = "";
+    for (qint64 alignedTime = alignedStart.toSecsSinceEpoch(); 
+         alignedTime <= xRange.upper; 
+         alignedTime += timeStepSeconds) {
+        
+        if (alignedTime < xRange.lower) continue;
+        
+        QDateTime dt = QDateTime::fromSecsSinceEpoch(alignedTime);
+        QString currentDateStr = dt.toString("dd.MM.yyyy");
+        QString timeStr = dt.toString("hh:mm");
+        
+        QString label;
+        if (currentDateStr != lastDateStr) {
+            // Дата изменилась - показываем дату и время
+            if (timeRange <= 86400) {
+                label = timeStr; // Для одного дня - только время
+            } else {
+                label = QString("%1\n%2").arg(currentDateStr).arg(timeStr);
+            }
+            lastDateStr = currentDateStr;
+        } else {
+            // Дата та же - только время
+            label = timeStr;
+        }
+        
+        timeTicker->addTick(alignedTime, label);
+    }
+    
+    customPlot->xAxis->setTicker(timeTicker);
 }
 
-void MainWindow::exportChart() {
-    QMessageBox::information(this, "Export", "Export functionality not implemented yet");
+bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
+    if (obj == customPlot) {
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+            
+            // Навигация по времени
+            switch (keyEvent->key()) {
+            case Qt::Key_Left:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    panHorizontal(-1);  // Плавный сдвиг влево
+                } else {
+                    navigateTime(-1);   // Обычная навигация
+                }
+                return true;
+                
+            case Qt::Key_Right:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    panHorizontal(1);   // Плавный сдвиг вправо
+                } else {
+                    navigateTime(1);    // Обычная навигация
+                }
+                return true;
+                
+            case Qt::Key_Up:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    zoomVertical(0.8);  // Увеличить масштаб
+                } else {
+                    panVertical(1);     // Сдвинуть вверх
+                }
+                return true;
+                
+            case Qt::Key_Down:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    zoomVertical(1.25); // Уменьшить масштаб
+                } else {
+                    panVertical(-1);    // Сдвинуть вниз
+                }
+                return true;
+                
+            case Qt::Key_PageUp:
+                jumpToPeriodBoundary(-1);
+                return true;
+                
+            case Qt::Key_PageDown:
+                jumpToPeriodBoundary(1);
+                return true;
+                
+            case Qt::Key_Home:
+                if (keyEvent->modifiers() & Qt::ShiftModifier) {
+                    resetAllZoom();
+                } else {
+                    goToStart();
+                }
+                return true;
+                
+            case Qt::Key_End:
+                goToEnd();
+                return true;
+                
+            case Qt::Key_D:
+                setTimeScale(Day);
+                return true;
+                
+            case Qt::Key_W:
+                setTimeScale(Week);
+                return true;
+                
+            case Qt::Key_M:
+                setTimeScale(Month);
+                return true;
+                
+            case Qt::Key_T:
+                toggleTemperatureGraph();
+                return true;
+                
+            case Qt::Key_H:
+                toggleHumidityGraph();
+                return true;
+                
+            case Qt::Key_P:
+                toggleDisplayMode();
+                return true;
+                
+            // ДОБАВИТЬ: удаление выделенных графиков
+            case Qt::Key_Delete:
+                deleteSelectedGraphs();
+                return true;
+            }
+        }
+        
+        if (event->type() == QEvent::Wheel) {
+            QWheelEvent *wheelEvent = static_cast<QWheelEvent*>(event);
+            
+            if (wheelEvent->modifiers() & Qt::ShiftModifier) {
+                // Shift + колесо = вертикальный зум
+                double factor = wheelEvent->angleDelta().y() > 0 ? 0.9 : 1.1;
+                zoomVertical(factor);
+                return true;
+            } else {
+                // Обычное колесо = горизонтальный зум (по времени)
+                QCPRange range = customPlot->xAxis->range();
+                double center = (range.lower + range.upper) / 2.0;
+                double factor = wheelEvent->angleDelta().y() > 0 ? 0.9 : 1.1;
+                double newSize = range.size() * factor;
+                customPlot->xAxis->setRange(center - newSize/2, center + newSize/2);
+                
+                // ДОБАВИТЬ: обновить шкалу времени после зума
+                updateTimeScale();
+                
+                customPlot->replot();
+                updateStatusStats();
+                return true;
+            }
+        }
+        
+        if (event->type() == QEvent::KeyRelease) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+            if (keyEvent->key() == Qt::Key_Shift) {
+                if (showCursor) {
+                    hideCrosshair();
+                    showCursor = false;
+                }
+                return true;
+            }
+        }
+    }
+    
+    return QMainWindow::eventFilter(obj, event);
 }
 
 void MainWindow::deleteSelectedGraphs() {
@@ -2025,6 +2174,132 @@ void MainWindow::deleteSelectedFromSingleFile() {
         
         customPlot->replot();
         statusBar()->showMessage("Selected graphs hidden (use T/H to show)", 3000);
+    }
+}
+
+// ИСПРАВИТЬ: методы печати - заменить строки с toRect()
+void MainWindow::printChart() {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageOrientation(QPageLayout::Landscape);
+    
+    QPrintDialog dialog(&printer, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        // Проверить режим черно-белой печати
+        bool blackWhite = blackWhitePrintAction ? blackWhitePrintAction->isChecked() : false;
+        
+        if (blackWhite) {
+            printInBlackAndWhite(&printer);
+        } else {
+            // ИСПРАВИТЬ: убрать toRect() - QRect уже является QRect
+            QPixmap pixmap = customPlot->toPixmap(1920, 1080, 2.0);
+            QPainter painter(&printer);
+            QRect printRect = printer.pageLayout().paintRectPixels(printer.resolution());
+            painter.drawPixmap(printRect, pixmap);
+        }
+    }
+}
+
+void MainWindow::printPreview() {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageOrientation(QPageLayout::Landscape);
+    
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, &QPrintPreviewDialog::paintRequested, [this](QPrinter *printer) {
+        // Проверить режим черно-белой печати
+        bool blackWhite = blackWhitePrintAction ? blackWhitePrintAction->isChecked() : false;
+        
+        if (blackWhite) {
+            printInBlackAndWhite(printer);
+        } else {
+            // ИСПРАВИТЬ: убрать toRect() - QRect уже является QRect
+            QPixmap pixmap = customPlot->toPixmap(1920, 1080, 2.0);
+            QPainter painter(printer);
+            QRect printRect = printer->pageLayout().paintRectPixels(printer->resolution());
+            painter.drawPixmap(printRect, pixmap);
+        }
+    });
+    
+    preview.exec();
+}
+
+void MainWindow::printInBlackAndWhite(QPrinter *printer) {
+    // Сохранить оригинальные цвета
+    QMap<QCPGraph*, QPen> originalPens;
+    QMap<QCPGraph*, QCPScatterStyle> originalScatterStyles;
+    
+    for (int i = 0; i < customPlot->graphCount(); ++i) {
+        QCPGraph* graph = customPlot->graph(i);
+        originalPens[graph] = graph->pen();
+        originalScatterStyles[graph] = graph->scatterStyle();
+        
+        // Установить черно-белые стили
+        QPen bwPen = graph->pen();
+        if (i % 2 == 0) { // Температура - сплошная линия
+            bwPen.setColor(Qt::black);
+            bwPen.setStyle(Qt::SolidLine);
+        } else { // Влажность - пунктирная линия
+            bwPen.setColor(Qt::black);
+            bwPen.setStyle(Qt::DashLine);
+        }
+        graph->setPen(bwPen);
+        
+        // Черно-белые точки
+        QCPScatterStyle bwScatter = graph->scatterStyle();
+        bwScatter.setPen(QPen(Qt::black));
+        bwScatter.setBrush(QBrush(Qt::white));
+        graph->setScatterStyle(bwScatter);
+    }
+    
+    // ИСПРАВИТЬ: убрать toRect() - QRect уже является QRect
+    customPlot->replot();
+    QPixmap pixmap = customPlot->toPixmap(1920, 1080, 2.0);
+    QPainter painter(printer);
+    QRect printRect = printer->pageLayout().paintRectPixels(printer->resolution());
+    painter.drawPixmap(printRect, pixmap);
+    
+    // Восстановить оригинальные цвета
+    for (auto it = originalPens.begin(); it != originalPens.end(); ++it) {
+        it.key()->setPen(it.value());
+    }
+    for (auto it = originalScatterStyles.begin(); it != originalScatterStyles.end(); ++it) {
+        it.key()->setScatterStyle(it.value());
+    }
+    customPlot->replot();
+}
+
+void MainWindow::copyChartToClipboard() {
+    QPixmap pixmap = customPlot->toPixmap(1920, 1080, 2.0);
+    QApplication::clipboard()->setPixmap(pixmap);
+    statusBar()->showMessage("Chart copied to clipboard", 2000);
+}
+
+void MainWindow::exportChart() {
+    QString lastDir = getLastDirectory();
+    QString filePath = QFileDialog::getSaveFileName(this,
+        "Export Chart", lastDir + "/chart.png",
+        "PNG Images (*.png);;JPEG Images (*.jpg);;PDF Files (*.pdf);;All Files (*)");
+    
+    if (filePath.isEmpty()) return;
+    
+    setLastDirectory(QFileInfo(filePath).absolutePath());
+    
+    QFileInfo fileInfo(filePath);
+    QString suffix = fileInfo.suffix().toLower();
+    
+    bool success = false;
+    if (suffix == "pdf") {
+        // ИСПРАВИТЬ: использовать savePdf для PDF
+        success = customPlot->savePdf(filePath, 1920, 1080);
+    } else {
+        // Для PNG/JPEG экспорт с высоким качеством
+        QPixmap pixmap = customPlot->toPixmap(1920, 1080, 2.0);
+        success = pixmap.save(filePath);
+    }
+    
+    if (success) {
+        statusBar()->showMessage(QString("Chart exported to %1").arg(filePath), 3000);
+    } else {
+        QMessageBox::warning(this, "Export Error", "Failed to export chart");
     }
 }
 

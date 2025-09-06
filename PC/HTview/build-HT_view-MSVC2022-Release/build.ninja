@@ -183,7 +183,7 @@ build HT_view_autogen\timestamp HT_view_autogen\mocs_compilation.cpp | ${cmake_n
 #############################################
 # Phony custom command for CMakeFiles\HT_view_autogen_timestamp_deps
 
-build CMakeFiles\HT_view_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles\HT_view_autogen_timestamp_deps: phony C$:\Qt\6.6.0\msvc2019_64\lib\Qt6PrintSupport.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Widgets.lib C$:\Qt\6.6.0\msvc2019_64\.\bin\uic.exe C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Core.lib C$:\Qt\6.6.0\msvc2019_64\.\bin\moc.exe
+build CMakeFiles\HT_view_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles\HT_view_autogen_timestamp_deps: phony C$:\Qt\6.6.0\msvc2019_64\lib\Qt6PrintSupport.lib C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Widgets.lib C$:\Qt\6.6.0\msvc2019_64\.\bin\moc.exe C$:\Qt\6.6.0\msvc2019_64\lib\Qt6Core.lib C$:\Qt\6.6.0\msvc2019_64\.\bin\uic.exe
 
 
 #############################################

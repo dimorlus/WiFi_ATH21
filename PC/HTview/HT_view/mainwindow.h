@@ -174,6 +174,10 @@ private:
     
     // Печать и экспорт
     void renderChartToPrinter(QPrinter *printer, bool useColor);
+    void printInBlackAndWhite(QPrinter *printer); // ДОБАВИТЬ
+    
+    void autoAdjustTimeScale(); // ДОБАВИТЬ
+    void updateTimeScale(); // ДОБАВИТЬ
 };
 
 #endif // MAINWINDOW_H
