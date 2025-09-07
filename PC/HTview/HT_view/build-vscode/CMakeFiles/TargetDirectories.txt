@@ -1,0 +1,5 @@
+D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build-vscode/CMakeFiles/HT_view.dir
+D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build-vscode/CMakeFiles/edit_cache.dir
+D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build-vscode/CMakeFiles/rebuild_cache.dir
+D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build-vscode/CMakeFiles/HT_view_autogen_timestamp_deps.dir
+D:/Projects/LED/Alex/WiFi_AHT21/PC/HTview/HT_view/build-vscode/CMakeFiles/HT_view_autogen.dir
