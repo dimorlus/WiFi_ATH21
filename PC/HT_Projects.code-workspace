@@ -1,0 +1,26 @@
+{
+    "folders": [
+        {
+            "name": "HT_view (Visualizer)",
+            "path": "./HT_view"
+        },
+        {
+            "name": "mqtt_logger (Data Collector)", 
+            "path": "./mqtt_logger"
+        }
+    ],
+    "settings": {
+        "cmake.sourceDirectory": "${workspaceFolder:HT_view}",
+        "files.associations": {
+            "*.h": "cpp",
+            "*.cpp": "cpp"
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-vscode.cpptools",
+            "ms-vscode.cmake-tools",
+            "twxs.cmake"
+        ]
+    }
+}

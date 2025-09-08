@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug HT_view",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder:HT_view}/build/HT_view.exe",
+            "cwd": "${workspaceFolder:HT_view}",
+            "environment": [
+                {"name": "PATH", "value": "C:/Qt/6.6.0/msvc2019_64/bin;${env:PATH}"}
+            ]
+        },
+        {
+            "name": "Debug mqtt_logger",
+            "type": "cppvsdbg", 
+            "request": "launch",
+            "program": "${workspaceFolder:mqtt_logger}/build/mqtt_logger.exe",
+            "cwd": "${workspaceFolder:mqtt_logger}"
+        }
+    ]
+}

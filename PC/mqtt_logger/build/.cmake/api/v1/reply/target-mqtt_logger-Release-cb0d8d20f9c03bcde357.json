@@ -27,7 +27,7 @@
 			"C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
 			"CMakeLists.txt",
 			"C:/vcpkg/installed/x64-mingw-static/share/eclipse-paho-mqtt-c/eclipse-paho-mqtt-cConfig.cmake",
-			"C:/Program Files/CMake/share/cmake-3.27/Modules/CMakeFindDependencyMacro.cmake",
+			"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeFindDependencyMacro.cmake",
 			"C:/vcpkg/installed/x64-mingw-static/share/pahomqttcpp/PahoMqttCppConfig.cmake"
 		],
 		"nodes" : 
@@ -96,7 +96,7 @@
 			{
 				"command" : 6,
 				"file" : 3,
-				"line" : 76,
+				"line" : 47,
 				"parent" : 10
 			},
 			{
@@ -123,7 +123,10 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-O3 -DNDEBUG -std=gnu++17"
+					"fragment" : "-O3 -DNDEBUG"
+				},
+				{
+					"fragment" : "-std=gnu++17"
 				}
 			],
 			"includes" : 

@@ -2,25 +2,21 @@
 {
   "directory": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build",
   "command": "c:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe  @CMakeFiles/mqtt_logger.dir/includes_CXX.rsp -O3 -DNDEBUG -std=gnu++17 -o CMakeFiles\\mqtt_logger.dir\\src\\main.cpp.obj -c D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\mqtt_logger\\src\\main.cpp",
-  "file": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/main.cpp",
-  "output": "CMakeFiles/mqtt_logger.dir/src/main.cpp.obj"
+  "file": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/main.cpp"
 },
 {
   "directory": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build",
   "command": "c:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe  @CMakeFiles/mqtt_logger.dir/includes_CXX.rsp -O3 -DNDEBUG -std=gnu++17 -o CMakeFiles\\mqtt_logger.dir\\src\\config.cpp.obj -c D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\mqtt_logger\\src\\config.cpp",
-  "file": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/config.cpp",
-  "output": "CMakeFiles/mqtt_logger.dir/src/config.cpp.obj"
+  "file": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/config.cpp"
 },
 {
   "directory": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build",
   "command": "c:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe  @CMakeFiles/mqtt_logger.dir/includes_CXX.rsp -O3 -DNDEBUG -std=gnu++17 -o CMakeFiles\\mqtt_logger.dir\\src\\logger.cpp.obj -c D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\mqtt_logger\\src\\logger.cpp",
-  "file": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/logger.cpp",
-  "output": "CMakeFiles/mqtt_logger.dir/src/logger.cpp.obj"
+  "file": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/logger.cpp"
 },
 {
   "directory": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build",
   "command": "c:\\Qt\\Tools\\mingw1120_64\\bin\\g++.exe  @CMakeFiles/mqtt_logger.dir/includes_CXX.rsp -O3 -DNDEBUG -std=gnu++17 -o CMakeFiles\\mqtt_logger.dir\\src\\replace_macros.cpp.obj -c D:\\Projects\\LED\\Alex\\WiFi_AHT21\\PC\\mqtt_logger\\src\\replace_macros.cpp",
-  "file": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/replace_macros.cpp",
-  "output": "CMakeFiles/mqtt_logger.dir/src/replace_macros.cpp.obj"
+  "file": "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/replace_macros.cpp"
 }
 ]

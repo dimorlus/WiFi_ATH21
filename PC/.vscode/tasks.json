@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build HT_view",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build"],
+            "options": {
+                "cwd": "${workspaceFolder:HT_view}"
+            },
+            "group": "build"
+        },
+        {
+            "label": "Build mqtt_logger", 
+            "type": "shell",
+            "command": "Build.bat",
+            "options": {
+                "cwd": "${workspaceFolder:mqtt_logger}"
+            },
+            "group": "build"
+        },
+        {
+            "label": "Build All Projects",
+            "dependsOrder": "parallel",
+            "dependsOn": ["Build HT_view", "Build mqtt_logger"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

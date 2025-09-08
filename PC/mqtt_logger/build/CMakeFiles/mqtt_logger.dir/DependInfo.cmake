@@ -14,8 +14,8 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/src/replace_macros.cpp" "CMakeFiles/mqtt_logger.dir/src/replace_macros.cpp.obj" "gcc" "CMakeFiles/mqtt_logger.dir/src/replace_macros.cpp.obj.d"
   )
 
-# Targets to which this target links which contain Fortran sources.
-set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+# Targets to which this target links.
+set(CMAKE_TARGET_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.
