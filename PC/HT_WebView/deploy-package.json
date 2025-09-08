@@ -1,0 +1,15 @@
+{
+  "name": "ht-webview-server",
+  "version": "1.0.0",
+  "description": "HT WebView Production Server",
+  "main": "deploy-server.js",
+  "scripts": {
+    "start": "node deploy-server.js",
+    "install-service": "node install-service.js",
+    "uninstall-service": "node uninstall-service.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-windows": "^1.0.0-beta.8"
+  }
+}
