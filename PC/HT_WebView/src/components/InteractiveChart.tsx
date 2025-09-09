@@ -1,5 +1,6 @@
-import { useState, useCallback, useRef } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Brush, ReferenceLine } from 'recharts'
+import { useState, useCallback } from 'react'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Brush } from 'recharts'
+import { useChartInteraction } from '../hooks/useChartInteraction'
 
 interface InteractiveChartProps {
   data: Array<{
@@ -32,7 +33,12 @@ export const InteractiveChart = ({
 }: InteractiveChartProps) => {
   const [brushKey, setBrushKey] = useState(0) // Ключ для принудительного обновления Brush
   const [forceUpdate, setForceUpdate] = useState(0) // Дополнительный триггер обновления
-  const chartRef = useRef<any>(null)
+  
+  // Интерактивное управление графиком
+  const { chartRef: interactionRef, zoomRange, resetZoom: resetInteractiveZoom, isDragging } = useChartInteraction({
+    data,
+    onBrushChange: onBrushChange
+  })
 
   const handleBrushChange = useCallback((newBrushData: any) => {
     if (onBrushChange) {
@@ -42,6 +48,10 @@ export const InteractiveChart = ({
 
   const handleResetZoom = () => {
     console.log('InteractiveChart: Reset zoom clicked') // Debug
+    
+    // Сбрасываем интерактивный зум
+    resetInteractiveZoom()
+    
     setBrushKey(prev => prev + 1) // Принудительно обновляем Brush компонент
     setForceUpdate(prev => prev + 1) // Принудительно обновляем весь компонент
     if (onBrushChange) {
@@ -111,11 +121,17 @@ export const InteractiveChart = ({
       <div className="chart-header">
         <h3>{icon} {title}</h3>
         <div className="chart-controls">
+          <div className="chart-status">
+            {isDragging && <span className="drag-indicator">🤏 Dragging...</span>}
+            <span className="zoom-info">
+              🔍 Zoom: {zoomRange.start}-{zoomRange.end} ({zoomRange.end - zoomRange.start + 1} points)
+            </span>
+          </div>
           {hasZoom && (
             <button 
               onClick={handleResetZoom}
               className="reset-zoom-btn"
-              title="Reset zoom"
+              title="Reset zoom (or scroll to zoom, drag to pan)"
             >
               🔍 Reset Zoom
             </button>
@@ -123,13 +139,25 @@ export const InteractiveChart = ({
         </div>
       </div>
       
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart 
-          key={`interactive-chart-${brushKey}-${forceUpdate}`}
-          ref={chartRef}
+      <div className="chart-interaction-hint">
+        💡 Use mouse wheel to zoom, drag to pan
+      </div>
+      
+      <div 
+        style={{ 
+          position: 'relative',
+          cursor: isDragging ? 'grabbing' : 'grab'
+        }} 
+        ref={interactionRef}
+        title="Chart area: wheel=zoom, drag=pan | Brush area: drag=navigate"
+      >
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart 
+            key={`interactive-chart-${brushKey}-${forceUpdate}`}
           data={data}
           margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
           syncId="anyId"
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
         >
           <CartesianGrid 
             strokeDasharray="3 3" 
@@ -198,7 +226,8 @@ export const InteractiveChart = ({
             travellerWidth={12}
           />
         </LineChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      </div>
       
       <div className="chart-info">
         <span className="data-points">

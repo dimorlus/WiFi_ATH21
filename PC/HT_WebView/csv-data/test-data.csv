@@ -1,0 +1,6 @@
+TIME;TEMP;HUM;DEV
+Mon, Sep 09 2024 10:00;23.5;45.2;Sensor01
+Mon, Sep 09 2024 10:01;23.7;45.0;Sensor01  
+Mon, Sep 09 2024 10:02;23.8;44.8;Sensor01
+Mon, Sep 09 2024 10:03;24.0;44.5;Sensor01
+Mon, Sep 09 2024 10:04;24.2;44.3;Sensor01

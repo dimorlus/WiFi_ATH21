@@ -1,5 +1,7 @@
-import { useState, useCallback, useRef } from 'react'
+// Combined Chart with interactive controls + Brush navigation
+import { useState, useCallback } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Brush } from 'recharts'
+import { useChartInteraction } from '../hooks/useChartInteraction'
 
 interface CombinedChartProps {
   data: Array<{
@@ -11,59 +13,110 @@ interface CombinedChartProps {
     index: number
     device: string
   }>
+  fileName?: string
 }
 
-export const CombinedChart = ({ data }: CombinedChartProps) => {
-  const [brushData, setBrushData] = useState<{ startIndex?: number; endIndex?: number }>({})
-  const [brushKey, setBrushKey] = useState(0) // Ключ для принудительного обновления Brush
-  const [forceUpdate, setForceUpdate] = useState(0) // Дополнительный триггер обновления
-  const chartRef = useRef<any>(null)
-
-  const handleBrushChange = useCallback((newBrushData: any) => {
-    console.log('Brush change:', newBrushData) // Debug
-    setBrushData({
-      startIndex: newBrushData?.startIndex,
-      endIndex: newBrushData?.endIndex
-    })
+export const CombinedChart = ({ data, fileName }: CombinedChartProps) => {
+  // Состояние для координации между interactive и brush
+  const [brushKey, setBrushKey] = useState(0)
+  
+  // Interactive управление - основной источник зума
+  const { chartRef: interactionRef, zoomRange, resetZoom: resetInteractiveZoom, isDragging } = useChartInteraction({
+    data
+  })
+  
+  // Обработчик Brush - обновляем interactive zoom, но только от Brush
+  const handleBrushChange = useCallback((brushData: any) => {
+    console.log('CombinedChart: Brush change:', brushData) // Debug
+    // Когда пользователь перетаскивает Brush, обновляем только отображение
+    // НЕ вызываем setZoomRange чтобы избежать циклов
   }, [])
+  
+  const hasZoom = zoomRange.start !== 0 || zoomRange.end !== data.length - 1
+
+  // Используем ВСЕ данные для LineChart (как в InteractiveChart)
+  // Brush будет управлять отображением автоматически
+  const safeDisplayData = data.length >= 2 ? data : data.slice(0, Math.min(2, data.length))
+  
+  // Рассчитываем размер отображаемого диапазона для статистики
+  const displayedCount = hasZoom ? zoomRange.end - zoomRange.start + 1 : data.length
 
   const handleResetZoom = () => {
-    console.log('Reset zoom clicked') // Debug
-    console.log('Current brushData:', brushData) // Debug
+    console.log('CombinedChart: Reset zoom clicked') // Debug
     
-    // Сбрасываем состояние brush
-    setBrushData({ startIndex: undefined, endIndex: undefined })
+    // Сбрасываем интерактивный зум
+    resetInteractiveZoom()
     
-    // Принудительно обновляем ключ для пересоздания Brush
-    setBrushKey(prev => {
-      console.log('Updating brush key from', prev, 'to', prev + 1) // Debug
-      return prev + 1
-    })
-    
-    // Принудительно обновляем весь компонент
-    setForceUpdate(prev => prev + 1)
-    
-    // Дополнительно попробуем через setTimeout для гарантии обновления
-    setTimeout(() => {
-      console.log('Delayed reset - final brushData should be empty') // Debug
-    }, 100)
+    // Принудительно обновляем Brush компонент
+    setBrushKey(prev => prev + 1)
   }
-
-  // Calculate dual Y-axis domains
-  const temperatures = data.map(d => d.temperature)
-  const humidities = data.map(d => d.humidity)
   
-  const tempMin = Math.min(...temperatures)
-  const tempMax = Math.max(...temperatures)
-  const tempPadding = (tempMax - tempMin) * 0.1
-  const tempDomain = [tempMin - tempPadding, tempMax + tempPadding]
-  
-  const humMin = Math.min(...humidities)
-  const humMax = Math.max(...humidities)
-  const humPadding = (humMax - humMin) * 0.1
-  const humDomain = [humMin - humPadding, humMax + humPadding]
+  console.log('Display data info:', {
+    totalData: data.length,
+    hasZoom,
+    zoomStart: zoomRange.start,
+    zoomEnd: zoomRange.end,
+    safeDisplayCount: safeDisplayData.length,
+    firstItem: safeDisplayData[0],
+    lastItem: safeDisplayData[safeDisplayData.length - 1]
+  }) // Debug
 
-  const hasZoom = brushData.startIndex !== undefined || brushData.endIndex !== undefined
+  // Calculate dual Y-axis domains based on zoom range (if zoomed) or all data
+  const domainData = hasZoom ? data.slice(zoomRange.start, zoomRange.end + 1) : data
+  const temperatures = domainData.map((d: any) => d.temperature).filter((t: any) => !isNaN(t) && t !== null && isFinite(t))
+  const humidities = domainData.map((d: any) => d.humidity).filter((h: any) => !isNaN(h) && h !== null && isFinite(h))
+  
+  console.log('Domain calculation:', {
+    safeDataLength: safeDisplayData.length,
+    validTemperatures: temperatures.length,
+    validHumidities: humidities.length,
+    tempSample: temperatures.slice(0, 5),
+    humSample: humidities.slice(0, 5)
+  }) // Debug
+  
+  // Более надежные fallback domains
+  let tempDomain: [number, number] = [-10, 50] // Типичный диапазон температур
+  let humDomain: [number, number] = [0, 100]   // Типичный диапазон влажности
+  
+  if (temperatures.length > 0) {
+    const tempMin = Math.min(...temperatures)
+    const tempMax = Math.max(...temperatures)
+    const tempRange = tempMax - tempMin
+    
+    if (tempRange === 0) {
+      // Все значения одинаковые - создаем симметричный диапазон
+      const padding = Math.max(2, Math.abs(tempMin) * 0.1)
+      tempDomain = [tempMin - padding, tempMax + padding]
+    } else if (tempRange < 0.1) {
+      // Очень малый диапазон - увеличиваем
+      const center = (tempMin + tempMax) / 2
+      tempDomain = [center - 1, center + 1]
+    } else {
+      // Нормальный диапазон
+      const padding = Math.max(0.5, tempRange * 0.1)
+      tempDomain = [tempMin - padding, tempMax + padding]
+    }
+  }
+  
+  if (humidities.length > 0) {
+    const humMin = Math.min(...humidities)
+    const humMax = Math.max(...humidities)
+    const humRange = humMax - humMin
+    
+    if (humRange === 0) {
+      // Все значения одинаковые
+      const padding = Math.max(2, Math.abs(humMin) * 0.1)
+      humDomain = [Math.max(0, humMin - padding), Math.min(100, humMax + padding)]
+    } else if (humRange < 0.1) {
+      // Очень малый диапазон
+      const center = (humMin + humMax) / 2
+      humDomain = [Math.max(0, center - 2), Math.min(100, center + 2)]
+    } else {
+      // Нормальный диапазон
+      const padding = Math.max(1, humRange * 0.1)
+      humDomain = [Math.max(0, humMin - padding), Math.min(100, humMax + padding)]
+    }
+  }
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     console.log('Tooltip render:', { 
@@ -114,13 +167,24 @@ export const CombinedChart = ({ data }: CombinedChartProps) => {
   return (
     <div className="chart-section combined-chart">
       <div className="chart-header">
-        <h3>📊 Combined Temperature & Humidity Chart</h3>
+        <h3>📊 Combined Temperature & Humidity Chart{fileName ? ` - ${fileName}` : ''}</h3>
         <div className="chart-controls">
+          <div className="chart-status">
+            {isDragging && <span className="drag-indicator">🤏 Dragging...</span>}
+            {hasZoom && (
+              <span className="zoom-info">
+                🔍 Showing: {zoomRange.start}-{zoomRange.end} ({zoomRange.end - zoomRange.start + 1} points)
+              </span>
+            )}
+            <span className="interactive-zoom-info">
+              🎯 Interactive: {zoomRange.start}-{zoomRange.end} ({zoomRange.end - zoomRange.start + 1} points)
+            </span>
+          </div>
           {hasZoom && (
             <button 
               onClick={handleResetZoom}
               className="reset-zoom-btn"
-              title="Reset zoom"
+              title="Reset zoom (or scroll to zoom, drag to pan)"
             >
               🔍 Reset Zoom
             </button>
@@ -128,14 +192,29 @@ export const CombinedChart = ({ data }: CombinedChartProps) => {
         </div>
       </div>
       
-      <ResponsiveContainer width="100%" height={500}>
-        <LineChart 
-          key={`chart-${brushKey}-${forceUpdate}`}
-          ref={chartRef}
-          data={data}
-          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-          syncId="anyId"
-        >
+      <div className="chart-interaction-hint">
+        💡 Use mouse wheel to zoom, drag to pan in chart area, or drag brush below to navigate
+      </div>
+      
+      <div 
+        className="chart-container" 
+        ref={interactionRef} 
+        style={{ 
+          position: 'relative',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none'
+        }}
+      >
+        <ResponsiveContainer width="100%" height={500}>
+          <LineChart
+            key={`combined-chart-${brushKey}`}
+            data={safeDisplayData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+            syncId="anyId"
+            style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+          >
           <CartesianGrid 
             strokeDasharray="3 3" 
             stroke="#e0e0e0" 
@@ -209,19 +288,18 @@ export const CombinedChart = ({ data }: CombinedChartProps) => {
             animationEasing="ease-in-out"
           />
           <Brush 
-            key={brushKey} 
+            key={brushKey}
             dataKey="shortTime" 
-            height={40} 
+            height={50} 
             stroke="#34495e"
             fill="#34495e"
             fillOpacity={0.15}
             onChange={handleBrushChange}
-            startIndex={brushData.startIndex}
-            endIndex={brushData.endIndex}
+            startIndex={hasZoom ? zoomRange.start : undefined}
+            endIndex={hasZoom ? zoomRange.end : undefined}
             tickFormatter={(value, index) => {
-              // Show every 10th tick to avoid crowding, показываем только время без даты
+              // Show every 10th tick to avoid crowding
               if (index % 10 === 0) {
-                // Извлекаем только время из формата "06.09 08:10"
                 const timePart = value.toString().split(' ')[1] || value.toString()
                 return timePart
               }
@@ -230,14 +308,13 @@ export const CombinedChart = ({ data }: CombinedChartProps) => {
             travellerWidth={12}
           />
         </LineChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      </div>
       
       <div className="chart-info">
         <span className="data-points">
           📊 {data.length} data points
-          {hasZoom && brushData.startIndex !== undefined && brushData.endIndex !== undefined &&
-            ` (showing ${brushData.endIndex - brushData.startIndex + 1})`
-          }
+          {hasZoom && ` (showing ${displayedCount})`}
         </span>
       </div>
     </div>

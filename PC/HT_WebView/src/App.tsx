@@ -10,17 +10,15 @@ interface SensorData {
   device: string
 }
 
-interface ChartData {
-  time: string
-  [key: string]: number | string
-}
-
 function App() {
   const [data, setData] = useState<SensorData[]>([])
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [selectedDevice, setSelectedDevice] = useState<string>('all')
   const [chartMode, setChartMode] = useState<'combined' | 'separate'>('combined')
   const [brushData, setBrushData] = useState<{ startIndex?: number; endIndex?: number }>({})
+  const [serverFiles, setServerFiles] = useState<any[]>([])
+  const [loadingServerFiles, setLoadingServerFiles] = useState(false)
+  const [currentFileName, setCurrentFileName] = useState<string>('')
 
   // Prepare chart data
   const chartData = useMemo(() => {
@@ -99,6 +97,61 @@ function App() {
     })
   }
 
+  // Загрузка списка файлов с сервера
+  const loadServerFiles = async () => {
+    setLoadingServerFiles(true)
+    try {
+      const response = await fetch('/api/csv-files')
+      const result = await response.json()
+      setServerFiles(result || [])
+    } catch (error) {
+      console.error('Error loading server files:', error)
+      setServerFiles([])
+    } finally {
+      setLoadingServerFiles(false)
+    }
+  }
+
+  // Загрузка CSV файла с сервера
+  const loadServerFile = async (filename: string) => {
+    try {
+      setCurrentFileName(filename)
+      const response = await fetch(`/api/csv/${filename}`)
+      const text = await response.text()
+      
+      // Parse the CSV text using the same logic as local files
+      const lines = text.split('\n')
+      const parsedData: SensorData[] = []
+
+      for (const line of lines) {
+        if (line.trim() && !line.startsWith('TIME')) {
+          const [time, temp, hum, device] = line.split(';')
+          if (time && temp && hum && device) {
+            let parsedTime = time.trim()
+            
+            if (!parsedTime.includes(',') && !parsedTime.includes('-') && !parsedTime.includes('/')) {
+              const today = new Date().toLocaleDateString('ru-RU')
+              parsedTime = `${today} ${parsedTime}`
+            }
+
+            parsedData.push({
+              time: parsedTime,
+              temperature: parseFloat(temp.trim()),
+              humidity: parseFloat(hum.trim()),
+              device: device.trim()
+            })
+          }
+        }
+      }
+
+      setData(parsedData)
+      setSelectedDevice('all')
+      setBrushData({})
+    } catch (error) {
+      console.error('Error loading server file:', error)
+    }
+  }
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -108,6 +161,7 @@ function App() {
   }
 
   const parseCSVFile = async (file: File) => {
+    setCurrentFileName(file.name)
     const text = await file.text()
     const lines = text.split('\n')
     const parsedData: SensorData[] = []
@@ -149,7 +203,7 @@ function App() {
       <main className="main-content">
         <div className="file-upload">
           <label htmlFor="csv-file" className="file-label">
-            📁 Select CSV File
+            📁 Select Local CSV File
           </label>
           <input
             id="csv-file"
@@ -162,6 +216,44 @@ function App() {
             <p className="file-info">
               Loaded: {selectedFile.name} ({data.length} records)
             </p>
+          )}
+        </div>
+
+        <div className="server-files">
+          <div className="server-files-header">
+            <h3>📂 Server CSV Files</h3>
+            <button 
+              onClick={loadServerFiles}
+              className="refresh-btn"
+              disabled={loadingServerFiles}
+            >
+              {loadingServerFiles ? '🔄 Loading...' : '🔄 Refresh'}
+            </button>
+          </div>
+          
+          {serverFiles.length > 0 && (
+            <div className="server-files-list">
+              {serverFiles.map((file: any) => (
+                <div key={file.name} className="server-file-item">
+                  <div className="file-info">
+                    <span className="file-name">📄 {file.name}</span>
+                    <span className="file-details">
+                      {(file.size / 1024).toFixed(1)}KB • {new Date(file.modified).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => loadServerFile(file.name)}
+                    className="load-btn"
+                  >
+                    Load
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {serverFiles.length === 0 && !loadingServerFiles && (
+            <p className="no-files">No CSV files found on server. Click Refresh to check again.</p>
           )}
         </div>
 
@@ -267,13 +359,13 @@ function App() {
 
             <div className="charts-container">
               {chartMode === 'combined' ? (
-                <CombinedChart data={chartData} />
+                <CombinedChart data={chartData} fileName={currentFileName} />
               ) : (
                 <>
                   <InteractiveChart
                     data={chartData}
                     dataKey="temperature"
-                    title="Temperature Chart"
+                    title={currentFileName ? `Temperature Chart - ${currentFileName}` : "Temperature Chart"}
                     color="#e74c3c"
                     unit="°C"
                     icon="🌡️"
@@ -284,7 +376,7 @@ function App() {
                   <InteractiveChart
                     data={chartData}
                     dataKey="humidity"
-                    title="Humidity Chart"
+                    title={currentFileName ? `Humidity Chart - ${currentFileName}` : "Humidity Chart"}
                     color="#3498db"
                     unit="%"
                     icon="💧"
