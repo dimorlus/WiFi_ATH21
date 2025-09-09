@@ -4,7 +4,7 @@
 
 ### 1️⃣ Остановите службу (Администратор):
 ```batch
-net stop "HT WebView Service"
+net stop "HT WebView Server"
 ```
 или запустите: **stop-service.bat**
 
@@ -19,7 +19,7 @@ node install-service.js
 
 ### 4️⃣ Запустите службу:
 ```batch
-net start "HT WebView Service"
+net start "HT WebView Server"
 ```
 
 ### 5️⃣ Проверьте новую функцию:

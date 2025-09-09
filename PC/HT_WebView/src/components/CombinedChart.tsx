@@ -6,6 +6,7 @@ import { useChartInteraction } from '../hooks/useChartInteraction'
 interface CombinedChartProps {
   data: Array<{
     time: string
+    timestamp: number
     shortTime: string
     fullDateTime: string
     temperature: number
@@ -221,13 +222,21 @@ export const CombinedChart = ({ data, fileName }: CombinedChartProps) => {
             opacity={0.5} 
           />
           <XAxis 
-            dataKey="shortTime" 
+            dataKey="timestamp"
+            type="number"
+            scale="time"
+            domain={['dataMin', 'dataMax']}
             angle={-45}
             textAnchor="end"
             height={80}
             fontSize={12}
             stroke="#666"
-            interval="preserveStartEnd"
+            tickFormatter={(value) => new Date(value).toLocaleString('ru-RU', { 
+              day: '2-digit',
+              month: '2-digit', 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            })}
           />
           <YAxis 
             yAxisId="temp"

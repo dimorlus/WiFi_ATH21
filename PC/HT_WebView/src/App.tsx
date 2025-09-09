@@ -31,6 +31,7 @@ function App() {
     return filteredData.map((item, index) => ({
       index,
       time: item.time, // Keep original time string with date
+      timestamp: new Date(item.time).getTime(), // Numeric timestamp for proper time axis
       shortTime: new Date(item.time).toLocaleString('ru-RU', { 
         day: '2-digit',
         month: '2-digit', 

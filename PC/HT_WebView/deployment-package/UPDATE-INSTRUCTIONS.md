@@ -6,12 +6,12 @@
 
 **Вариант А: Через Windows Services**
 - Откройте `services.msc`
-- Найдите "HT WebView Service"  
+- Найдите "HT WebView Server"  
 - Нажмите правой кнопкой → "Остановить"
 
 **Вариант Б: Через командную строку (Администратор)**
 ```batch
-net stop "HT WebView Service"
+net stop "HT WebView Server"
 ```
 
 **Вариант В: Используйте скрипт**
@@ -21,7 +21,7 @@ stop-service.bat
 
 ### 2. Проверьте что служба остановлена
 ```batch
-sc query "HT WebView Service"
+sc query "HT WebView Server"
 ```
 Должно показать: `STATE: 1 STOPPED`
 
@@ -41,7 +41,7 @@ node install-service.js
 
 ### 5. Запустите службу
 ```batch
-net start "HT WebView Service"
+net start "HT WebView Server"
 ```
 
 ### 6. Проверьте работу

@@ -5,6 +5,7 @@ import { useChartInteraction } from '../hooks/useChartInteraction'
 interface InteractiveChartProps {
   data: Array<{
     time: string
+    timestamp: number
     shortTime: string
     fullDateTime: string
     temperature?: number
@@ -165,13 +166,21 @@ export const InteractiveChart = ({
             opacity={0.5} 
           />
           <XAxis 
-            dataKey="shortTime" 
+            dataKey="timestamp"
+            type="number"
+            scale="time"
+            domain={['dataMin', 'dataMax']}
             angle={-45}
             textAnchor="end"
             height={80}
             fontSize={12}
             stroke="#666"
-            interval="preserveStartEnd"
+            tickFormatter={(value) => new Date(value).toLocaleString('ru-RU', { 
+              day: '2-digit',
+              month: '2-digit', 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            })}
           />
           <YAxis 
             label={{ value: `${title.split(' ')[0]} (${unit})`, angle: -90, position: 'insideLeft' }}

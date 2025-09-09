@@ -5,7 +5,7 @@ echo =========================================
 echo.
 
 echo Stopping HT WebView service...
-net stop "HT WebView Service" 2>nul
+net stop "HT WebView Server" 2>nul
 if %errorlevel% == 0 (
     echo ✅ Service stopped successfully
 ) else (
@@ -14,7 +14,7 @@ if %errorlevel% == 0 (
 
 echo.
 echo Checking service status...
-sc query "HT WebView Service" | find "STATE" 2>nul
+sc query "HT WebView Server" | find "STATE" 2>nul
 if %errorlevel% == 0 (
     echo.
     echo Service status checked. If STOPPED - ready for update.
@@ -25,6 +25,6 @@ if %errorlevel% == 0 (
 echo.
 echo ℹ️  Next steps:
 echo    1. Install new version with: node install-service.js
-echo    2. Start service with: net start "HT WebView Service"
+echo    2. Start service with: net start "HT WebView Server"
 echo.
 pause
