@@ -48,9 +48,9 @@ typedef struct
   uint8_t node_place[32];
   uint8_t TZ[48];
 
-  uint8_t mqtt_keepalive;
-  uint8_t security;
-  int8_t utc;
+  uint32_t mqtt_keepalive;
+  uint32_t security;
+  int32_t utc;
 
   int32_t tzDiff;
  } SYSCFG;

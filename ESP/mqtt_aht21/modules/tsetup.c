@@ -37,10 +37,10 @@ LOCAL void tcp_server_str(char *pbuf)
 //---------------------------------------------------------------------------
 
 /******************************************************************************
-  * FunctionName : tcp_server_recv_cb
-  * Description  : receive callback.
-  * Parameters   : arg -- Additional argument to pass to the callback function
-  * Returns      : none
+ ï¿½* FunctionName : tcp_server_recv_cb
+ ï¿½* Descriptionï¿½ : receive callback.
+ ï¿½* Parametersï¿½ï¿½ : arg -- Additional argument to pass to the callback function
+ ï¿½* Returnsï¿½ï¿½ï¿½ï¿½ï¿½ : none
  *******************************************************************************/
 LOCAL void ICACHE_FLASH_ATTR tcp_server_recv_cb(void *arg, char *pusrdata, unsigned short length)
  {
@@ -84,10 +84,10 @@ LOCAL void ICACHE_FLASH_ATTR tcp_server_recv_cb(void *arg, char *pusrdata, unsig
  }
 //---------------------------------------------------------------------------
 /******************************************************************************
-  * FunctionName : tcp_server_sent_cb
-  * Description  : data sent callback.
-  * Parameters   : arg -- Additional argument to pass to the callback function
-  * Returns      : none
+ ï¿½* FunctionName : tcp_server_sent_cb
+ ï¿½* Descriptionï¿½ : data sent callback.
+ ï¿½* Parametersï¿½ï¿½ : arg -- Additional argument to pass to the callback function
+ ï¿½* Returnsï¿½ï¿½ï¿½ï¿½ï¿½ : none
  *******************************************************************************/
 LOCAL void ICACHE_FLASH_ATTR tcp_server_sent_cb(void *arg)
  {
@@ -101,10 +101,10 @@ LOCAL void ICACHE_FLASH_ATTR tcp_server_sent_cb(void *arg)
  }
 //---------------------------------------------------------------------------
 /******************************************************************************
-  * FunctionName : tcp_server_discon_cb
-  * Description  : disconnect callback.
-  * Parameters   : arg -- Additional argument to pass to the callback function
-  * Returns      : none
+ ï¿½* FunctionName : tcp_server_discon_cb
+ ï¿½* Descriptionï¿½ : disconnect callback.
+ ï¿½* Parametersï¿½ï¿½ : arg -- Additional argument to pass to the callback function
+ ï¿½* Returnsï¿½ï¿½ï¿½ï¿½ï¿½ : none
  *******************************************************************************/
 LOCAL void ICACHE_FLASH_ATTR tcp_server_discon_cb(void *arg)
  {
@@ -122,10 +122,10 @@ LOCAL void ICACHE_FLASH_ATTR tcp_server_discon_cb(void *arg)
  }
 //---------------------------------------------------------------------------
 /******************************************************************************
-  * FunctionName : tcp_server_recon_cb
-  * Description  : reconnect callback, error occured in TCP connection.
-  * Parameters   : arg -- Additional argument to pass to the callback function
-  * Returns      : none
+ ï¿½* FunctionName : tcp_server_recon_cb
+ ï¿½* Descriptionï¿½ : reconnect callback, error occured in TCP connection.
+ ï¿½* Parametersï¿½ï¿½ : arg -- Additional argument to pass to the callback function
+ ï¿½* Returnsï¿½ï¿½ï¿½ï¿½ï¿½ : none
  *******************************************************************************/
 LOCAL void ICACHE_FLASH_ATTR tcp_server_recon_cb(void *arg, sint8 err)
  {
@@ -164,10 +164,10 @@ LOCAL void tcp_server_multi_send(char *pbuf, int len)
  }
 //---------------------------------------------------------------------------
 /******************************************************************************
-  * FunctionName : tcp_server_listen
-  * Description  : TCP server listened a connection successfully
-  * Parameters   : arg -- Additional argument to pass to the callback function
-  * Returns      : none
+ ï¿½* FunctionName : tcp_server_listen
+ ï¿½* Descriptionï¿½ : TCP server listened a connection successfully
+ ï¿½* Parametersï¿½ï¿½ : arg -- Additional argument to pass to the callback function
+ ï¿½* Returnsï¿½ï¿½ï¿½ï¿½ï¿½ : none
  *******************************************************************************/
 LOCAL void ICACHE_FLASH_ATTR tcp_server_listen(void *arg)
  {
@@ -186,10 +186,10 @@ LOCAL void ICACHE_FLASH_ATTR tcp_server_listen(void *arg)
 
 //---------------------------------------------------------------------------
 /******************************************************************************
-  * FunctionName : user_tcpserver_init
-  * Description  : parameter initialize as a TCP server
-  * Parameters   : port -- server port
-  * Returns      : none
+ ï¿½* FunctionName : user_tcpserver_init
+ ï¿½* Descriptionï¿½ : parameter initialize as a TCP server
+ ï¿½* Parametersï¿½ï¿½ : port -- server port
+ ï¿½* Returnsï¿½ï¿½ï¿½ï¿½ï¿½ : none
  *******************************************************************************/
 void ICACHE_FLASH_ATTR user_tcpserver_init(uint32_t port)
  {
@@ -211,4 +211,26 @@ void ICACHE_FLASH_ATTR user_tcpserver_init(uint32_t port)
 
   espconn_regist_time(&esp_conn, 60, 0);
  }
+//---------------------------------------------------------------------------
+void ICACHE_FLASH_ATTR tsetup_stop(void)
+{
+  // Disconnect all active clients
+  remot_info *premot = NULL;
+  if (espconn_get_connection_info(&esp_conn, &premot, 0) == ESPCONN_OK) {
+    uint8 count;
+    for (count = 0; count < esp_conn.link_cnt; count++) {
+      esp_conn.proto.tcp->remote_port = premot[count].remote_port;
+      esp_conn.proto.tcp->remote_ip[0] = premot[count].remote_ip[0];
+      esp_conn.proto.tcp->remote_ip[1] = premot[count].remote_ip[1];
+      esp_conn.proto.tcp->remote_ip[2] = premot[count].remote_ip[2];
+      esp_conn.proto.tcp->remote_ip[3] = premot[count].remote_ip[3];
+      espconn_disconnect(&esp_conn);
+    }
+  }
+  tidx = 0;
+  if (rstr) { os_free(rstr); rstr = 0; }
+  parse("", 0L, 0);
+  LeaveSetup();
+  PRN("tsetup_stop done\n");
+}
 //---------------------------------------------------------------------------

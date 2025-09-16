@@ -1,0 +1,393 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ESP8266: Build All",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "all"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "ESP8266: Clean",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "clean"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Rebuild",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "rebuild"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Flash",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "flash"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Flash Full",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "fullflash"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Build User1 (OTA)",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "BOOT=new",
+                "APP=1",
+                "all"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Build User2 Quick",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "BOOT=new",
+                "APP=2",
+                "all"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Build User2 (OTA)",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "BOOT=new",
+                "APP=2",
+                "all"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Flash User1",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "BOOT=new",
+                "APP=1",
+                "flash"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Flash User2 Quick",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "BOOT=new",
+                "APP=2",
+                "flash"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Flash User2",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "BOOT=new",
+                "APP=2",
+                "flash"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Flash Init",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "flashinit"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Flash Boot",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "BOOT=new",
+                "APP=1",
+                "flashboot"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Flash SSL Certificates",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "-f", 
+                "${workspaceFolder}/Makefile", 
+                "flashssl"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "ESP8266: Build Release (bld.bat)",
+            "type": "shell",
+            "command": "bld.bat",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Serial Monitor (PuTTY)",
+            "type": "shell",
+            "command": "putty.exe",
+            "args": [
+                "-serial",
+                "COM3",
+                "-sercfg",
+                "115200,8,n,1,N"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "Serial Monitor (PowerShell)",
+            "type": "shell",
+            "command": "[System.IO.Ports.SerialPort]::getportnames() | Write-Host; $port = new-Object System.IO.Ports.SerialPort COM3,115200,None,8,one; $port.Open(); while($true) { if($port.BytesToRead -gt 0) { Write-Host $port.ReadLine() } Start-Sleep -m 10 }",
+            "group": "test",
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "Check COM Ports",
+            "type": "shell", 
+            "command": "Get-WmiObject -Class Win32_SerialPort | Select-Object Name,DeviceID,Description",
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "User1: Build",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "BOOT=new",
+                "APP=1",
+                "all"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "User2: Build",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "BOOT=new",
+                "APP=2",
+                "all"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "User1: Flash",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "BOOT=new",
+                "APP=1",
+                "flash"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "User2: Flash",
+            "type": "shell",
+            "command": "mingw32-make.exe",
+            "args": [
+                "BOOT=new",
+                "APP=2",
+                "flash"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        }
+    ]
+}

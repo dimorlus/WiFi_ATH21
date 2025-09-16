@@ -1,0 +1,28 @@
+{
+    "folders": [
+        {
+            "name": "ESP8266 MQTT AHT21 Project",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "C_Cpp.default.configurationProvider": "ms-vscode.cpptools",
+        "C_Cpp.default.compilerPath": "c:/Espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc.exe",
+        "C_Cpp.default.intelliSenseMode": "gcc-x64",
+        "C_Cpp.default.cStandard": "gnu89",
+        "C_Cpp.default.cppStandard": "c++11",
+        "files.associations": {
+            "*.h": "c",
+            "*.c": "c", 
+            "Makefile": "makefile",
+            "*.mk": "makefile"
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-vscode.cpptools",
+            "ms-vscode.cpptools-extension-pack",
+            "ms-vscode.makefile-tools"
+        ]
+    }
+}

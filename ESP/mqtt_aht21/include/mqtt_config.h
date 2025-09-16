@@ -23,7 +23,7 @@ typedef enum{
 
 
 #ifdef _LAB_CONFIG_
-#define CFG_HOLDER          0x02FF55A8  /* Change this value to load default configurations */
+#define CFG_HOLDER          0x02FF55A5  /* Change this value to load default configurations */
 #define MQTT_HOST           "dorlov.no-ip.com"
 #define MQTT_PORT            1883 //no SSL: 19001, with SSL: 39001, 39002 = 2048 bit, 29001 - Web
 #define MQTT_TOPIC_BASE     "ORLOV"

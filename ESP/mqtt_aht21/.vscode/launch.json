@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ESP8266: Build and Flash",
+            "type": "node",
+            "request": "launch",
+            "preLaunchTask": "ESP8266: Build All",
+            "postDebugTask": "ESP8266: Flash",
+            "program": "${workspaceFolder}/build/app.out",
+            "console": "integratedTerminal"
+        }
+    ]
+}

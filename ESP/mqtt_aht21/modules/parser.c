@@ -23,7 +23,7 @@ typedef enum
 {
  tChr, tStr, tB64, tInt, tUInt, tFlt, tHex,
  tCmOn, tCmOff, tCmSave, tCmLoad, tCmRst,
- tCmHlp, tCmView, tCmInf
+ tCmFota, tCmHlp, tCmView, tCmInf
 } types;
 
 typedef enum {rError, rOk, rBOk} tres;
@@ -38,6 +38,9 @@ typedef struct
 
 //from user_main.c
 int ICACHE_FLASH_ATTR Info(u16 wifi, char *sstr);
+extern void ICACHE_FLASH_ATTR OTA(void);
+extern char otaUrl[64];
+
 //---------------------------------------------------------------------------
 
 static const crec Recs[] =
@@ -48,6 +51,7 @@ static const crec Recs[] =
  {"PWD", tStr, sizeof(sysCfg.sta_pwd), &sysCfg.sta_pwd},
  {"PLACE", tStr, sizeof(sysCfg.node_place), &sysCfg.node_place},
  {"TZ", tStr, sizeof(sysCfg.TZ), &sysCfg.TZ},
+ {"OTA", tStr, sizeof(otaUrl), &otaUrl},
  {"MQTT", tStr, sizeof(sysCfg.mqtt_host), &sysCfg.mqtt_host},
  {"MPORT", tUInt, sizeof(sysCfg.mqtt_port), &sysCfg.mqtt_port},
  {"TLS", tUInt, sizeof(sysCfg.security), &sysCfg.security},
@@ -61,6 +65,7 @@ static const crec Recs[] =
  {"SAVE", tCmSave, 0, 0L},
  {"LOAD", tCmLoad, 0, 0L},
  {"RESET", tCmRst, 0, 0L},
+ {"FOTA", tCmFota, 0, 0L},
  {"INFO", tCmInf, 0, 0L},
 };
 const RECS = sizeof(Recs)/sizeof(crec);
@@ -221,6 +226,9 @@ static int ICACHE_FLASH_ATTR command(int i, char *bres, int len)
    break;
    case tCmInf:
     pstr += inf(bres, len);
+   break;
+   case tCmFota:
+	OTA();
    break;
    case tCmRst:
     system_restart();

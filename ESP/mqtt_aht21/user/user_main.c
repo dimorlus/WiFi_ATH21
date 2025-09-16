@@ -51,7 +51,19 @@
 #include "ver.h"
 
 #define PUBLISH_UPTIME_LIMIT    10 //sec
-#define DISCONNECTED_TIMEOUT    30 //SEC - disconnected from Wi-Fi or TLS or MQTT
+#define DISCONNECTED_TIMEOUT    300 //SEC - disconnected from Wi-Fi or TLS or MQTT
+// ---------------- Sleep configuration ----------------
+// 1) Глубокий сон (deep sleep) в минутах. Требует GPIO16 (D0) -> RST. 0 = выкл.
+#define DEEP_SLEEP_MINUTES      10
+// 2) Лёгкий сон (light sleep) в секундах, по пробуждении выполняется программный reset.
+//    Минимальный упрощённый вариант без сегментов и fallback.
+#define LIGHT_SLEEP_SECONDS     600
+
+// Приоритет: если DEEP_SLEEP_MINUTES > 0 -> deep sleep; иначе если LIGHT_SLEEP_SECONDS > 0 -> light sleep.
+#ifndef SLEEP_STOP_SERVICES
+#define SLEEP_STOP_SERVICES 1   // 1 = перед сном выключить AP/HTTP/TCP (если активны)
+#endif
+
 #define RESTART_TIME            60 //1min
 #define MAC_MASK                0x1FF  //Post data if masked SNTP equal masked MAC (0x1ff == 8m 31s)
 #define WCNT                    4
@@ -68,8 +80,7 @@
 #define _OTA_
 #define SIC_TASK2   //Tags scan timer task
 
-#define RLED        12	//status alive = once in sec, or fast blink in setup
-#define GLED   	    13	//
+#define RLED        15	//status alive = once in sec, or fast blink in setup
 #define KEY0        0   //button
 #define PRN         os_printf
 //#define PRN
@@ -121,7 +132,7 @@ bool PostFlag = false;
 bool TSetup = false;
 u32 disconnected_time=0;
 u32 InfoFlag = 0;
-static char otaUrl[64];
+char otaUrl[64];
 char str[400];
 char topic[64];
 char base_topic[48];
@@ -246,6 +257,7 @@ void ICACHE_FLASH_ATTR PostData(void)
 
   os_sprintf(topic, "%s" TOPIC_HUMT, base_topic);
   PRN("Pub: %s:%s\n\r", topic, str);
+  PostFlag = true;
   int sz = os_strlen(str);
   MQTT_Publish(&mqttClient, topic, str, sz, MQTT_QOS, 0);
  }
@@ -260,7 +272,84 @@ bool ICACHE_FLASH_ATTR isTopic(const char *rtopic, const char *topic)
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+#if DEEP_SLEEP_MINUTES > 0
+static ETSTimer sleep_timer;
+static void ICACHE_FLASH_ATTR enter_deepsleep_cb(void *arg)
+{
+  PRN("Entering deep sleep for %d min\r\n", DEEP_SLEEP_MINUTES);
+#if SLEEP_STOP_SERVICES
+  // Отключаем возможные сервисы (AP / DHCP / HTTP) перед сном
+  uint8 op = wifi_get_opmode();
+  if (op & SOFTAP_MODE) {
+    wifi_softap_dhcps_stop();
+    // Сбросить в чистый режим перед NULL
+    wifi_set_opmode_current(STATION_MODE);
+  }
+#endif
+  MQTT_Disconnect(&mqttClient);
+  wifi_station_disconnect();
+  // Ensure RF is off before deep sleep
+  wifi_set_opmode_current(NULL_MODE);
 
+#ifdef RLED
+    easygpio_outputSet(RLED, 0);
+#endif
+
+  // 0 = RF cal after wake, 1 = skip RF cal (faster, lower power), 2 = RF disabled
+  system_deep_sleep_set_option(1);
+  os_delay_us(20000); // 20 ms to let RF shut down cleanly
+  system_deep_sleep((uint64)DEEP_SLEEP_MINUTES * 60ULL * 1000000ULL);
+}
+#endif
+
+// ---------------- Minimal light sleep implementation ----------------
+#if (DEEP_SLEEP_MINUTES == 0) && (LIGHT_SLEEP_SECONDS > 0)
+static void ICACHE_FLASH_ATTR ls_wakeup_cb_simple(void)
+{
+  PRN("Light sleep wake, restarting...\r\n");
+  wifi_fpm_close();
+  system_restart();
+}
+static void ICACHE_FLASH_ATTR enter_lightsleep_sequence(void)
+{
+  PRN("Entering light sleep %d s (simple)\r\n", LIGHT_SLEEP_SECONDS);
+  MQTT_Disconnect(&mqttClient);
+  httpd_stop();
+  tsetup_stop();
+  // Отключаем пользовательские таймеры
+  os_timer_disarm(&_1s_timer);
+  os_timer_disarm(&_10ms_timer);
+  wifi_station_dhcpc_stop();
+  wifi_station_disconnect();
+
+#ifdef RLED
+    easygpio_outputSet(RLED, 0);
+#endif
+#ifdef GLED
+    easygpio_outputSet(GLED, 0);
+#endif
+
+  wifi_set_opmode(NULL_MODE);  // set WiFi mode to null mode.
+  wifi_set_sleep_type(LIGHT_SLEEP_T);
+  wifi_fpm_set_sleep_type(LIGHT_SLEEP_T); // light sleep
+  wifi_station_set_auto_connect(0);
+
+  wifi_fpm_open();  // enable force sleep
+
+  wifi_fpm_set_wakeup_cb(ls_wakeup_cb_simple);
+  uint32_t us = (uint32_t)LIGHT_SLEEP_SECONDS * 1000000UL;
+  // Если слишком большое число — ограничим (теоретически SDK <= 0xFFFFFFF)
+  if (us > 0x0FFFFFF0) us = 0x0FFFFFF0;
+  uint32_t r = wifi_fpm_do_sleep(us);
+  PRN("wifi_fpm_do_sleep ret=%u\r\n", r);
+  // После вызова CPU остановится до пробуждения (если r==0). Если r!=0 — просто перезапустим.
+  if (r != 0) {
+    PRN("Light sleep start failed (%u), restarting immediately\r\n", r);
+    wifi_fpm_close();
+    system_restart();
+  }
+}
+#endif
 //---------------------------------------------------------------------------
 
 void ICACHE_FLASH_ATTR OTA(void)
@@ -293,15 +382,6 @@ LOCAL void ICACHE_FLASH_ATTR _1s_handler(void)
       disconnected_time++;
       RetryTime++;
      }
-    if (disconnected_time > 15)
-    PRN("\033""7disconnected %5d\033""8", disconnected_time);
-    if (RetryTime > 15)
-     {
-      RetryTime=0;
-      PRN("Try connect MQTT\n");
-      wifi_station_disconnect();
-      wifi_station_connect();
-     }
    }
   if (UpgradeRq)
    {
@@ -310,10 +390,13 @@ LOCAL void ICACHE_FLASH_ATTR _1s_handler(void)
     OTA();
    }
 
-  if ((disconnected_time > DISCONNECTED_TIMEOUT))
+  if ((disconnected_time == DISCONNECTED_TIMEOUT))
    {
     PRN("Timeout\r\n");
-    //system_restart();
+    os_timer_disarm(&_1s_timer);
+    os_timer_disarm(&_10ms_timer);
+
+    system_restart();
    }
 }
 
@@ -544,6 +627,20 @@ void mqttPublishedCb(uint32_t *args)
 {
  MQTT_Client* client = (MQTT_Client*)args;
  INFO("MQTT: Published\r\n");
+
+  if (PostFlag)
+   {
+	PostFlag = false;
+#if DEEP_SLEEP_MINUTES > 0
+  // Deep sleep после публикации
+  os_timer_disarm(&sleep_timer);
+  os_timer_setfn(&sleep_timer, (os_timer_func_t *)enter_deepsleep_cb, NULL);
+  os_timer_arm(&sleep_timer, 1000, 0);
+#elif (DEEP_SLEEP_MINUTES == 0) && (LIGHT_SLEEP_SECONDS > 0)
+  // Light sleep с перезапуском
+  enter_lightsleep_sequence();
+#endif
+   }
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

@@ -7,8 +7,8 @@
 #include "httpd.h"
 #include "config.h"
 
-//#define INFO os_printf
-#define INFO
+#define INFO os_printf
+//#define INFO
 #define ALLOC //use dynamic memory allocation
 
 #define HTTPD_MAX_CONN          4
@@ -124,27 +124,76 @@ const char *Codemessage(uint16_t code)
  }
 
 void ICACHE_FLASH_ATTR httpd_send_html(struct HttpdConnectionSlot *slot, uint16_t code, const char *fmt, ...)
- {
-  va_list al;
-  va_start(al, fmt);
-  int length = ets_vsnprintf(slot->buffer, HTTPD_BUFFER_SIZE - 1, fmt, al); //just for length
-  slot->bufferLen = os_sprintf(slot->buffer, http_hdr, code, Codemessage(code), mime_texthtml, length);
-  slot->bufferLen += ets_vsnprintf(&slot->buffer[slot->bufferLen], (HTTPD_BUFFER_SIZE - slot->bufferLen - 1), fmt, al);
-  va_end(al);
-  //os_printf("html: %d\n\r", slot->bufferLen);
+{
+  va_list ap1, ap2;
+  va_start(ap1, fmt);
+  va_copy(ap2, ap1); // duplicate for second pass
+  int body_len = ets_vsnprintf((char*)slot->buffer, HTTPD_BUFFER_SIZE - 1, fmt, ap1); // length query (will be overwritten)
+  va_end(ap1);
+  if (body_len < 0) body_len = 0;
+  // Hard cap to leave *some* room for header; will correct precisely below if still too large
+  if (body_len > (HTTPD_BUFFER_SIZE - 256)) body_len = HTTPD_BUFFER_SIZE - 256;
+
+  // First header attempt with desired body length
+  int header_len = os_sprintf((char*)slot->buffer, http_hdr, code, Codemessage(code), mime_texthtml, body_len);
+  int remain = HTTPD_BUFFER_SIZE - header_len - 1; // space available for body excluding terminating 0
+  if (remain < 0) remain = 0; // safety
+
+  // If body does not fit, reduce body_len and rewrite header with corrected length
+  if (body_len > remain) {
+    body_len = remain; // truncate to what we can actually send
+    header_len = os_sprintf((char*)slot->buffer, http_hdr, code, Codemessage(code), mime_texthtml, body_len);
+    remain = HTTPD_BUFFER_SIZE - header_len - 1;
+    if (remain < 0) remain = 0;
+  }
+
+  int written = 0;
+  if (remain > 0) {
+    written = ets_vsnprintf((char*)&slot->buffer[header_len], remain, fmt, ap2);
+    if (written < 0) written = 0;
+    if (written > remain) written = remain; // clamp (ets_vsnprintf should already do this)
+  }
+  va_end(ap2);
+
+  slot->bufferLen = header_len + written;
+  if (slot->bufferLen >= HTTPD_BUFFER_SIZE) slot->bufferLen = HTTPD_BUFFER_SIZE - 1; // clamp
+  slot->buffer[slot->bufferLen] = '\0';
   espconn_send(slot->conn, slot->buffer, slot->bufferLen);
- }
+}
 
 void ICACHE_FLASH_ATTR httpd_send_text(struct HttpdConnectionSlot *slot, uint16_t code, const char *fmt, ...)
- {
-  va_list al;
-  va_start(al, fmt);
-  int length = ets_vsnprintf(slot->buffer, HTTPD_BUFFER_SIZE - 1, fmt, al);
-  slot->bufferLen = os_sprintf(slot->buffer, http_hdr, code, Codemessage(code), mime_textplain, length);
-  slot->bufferLen += ets_vsnprintf(&slot->buffer[slot->bufferLen], (HTTPD_BUFFER_SIZE - slot->bufferLen - 1), fmt, al);
-  va_end(al);
+{
+  va_list ap1, ap2;
+  va_start(ap1, fmt);
+  va_copy(ap2, ap1);
+  int body_len = ets_vsnprintf((char*)slot->buffer, HTTPD_BUFFER_SIZE - 1, fmt, ap1); // length query
+  va_end(ap1);
+  if (body_len < 0) body_len = 0;
+  if (body_len > (HTTPD_BUFFER_SIZE - 256)) body_len = HTTPD_BUFFER_SIZE - 256;
+
+  int header_len = os_sprintf((char*)slot->buffer, http_hdr, code, Codemessage(code), mime_textplain, body_len);
+  int remain = HTTPD_BUFFER_SIZE - header_len - 1;
+  if (remain < 0) remain = 0;
+  if (body_len > remain) {
+    body_len = remain;
+    header_len = os_sprintf((char*)slot->buffer, http_hdr, code, Codemessage(code), mime_textplain, body_len);
+    remain = HTTPD_BUFFER_SIZE - header_len - 1;
+    if (remain < 0) remain = 0;
+  }
+
+  int written = 0;
+  if (remain > 0) {
+    written = ets_vsnprintf((char*)&slot->buffer[header_len], remain, fmt, ap2);
+    if (written < 0) written = 0;
+    if (written > remain) written = remain;
+  }
+  va_end(ap2);
+
+  slot->bufferLen = header_len + written;
+  if (slot->bufferLen >= HTTPD_BUFFER_SIZE) slot->bufferLen = HTTPD_BUFFER_SIZE - 1;
+  slot->buffer[slot->bufferLen] = '\0';
   espconn_send(slot->conn, slot->buffer, slot->bufferLen);
- }
+}
 
 static void ICACHE_FLASH_ATTR httpd_process_verb(struct HttpdConnectionSlot *slot, uint8_t *line, uint16_t len)
  {
@@ -370,20 +419,19 @@ static void ICACHE_FLASH_ATTR httpd_disconnect_callback(void *arg)
   //arg is wrong, so we need to manually loop over all slots.
   unsigned int i;
 #ifdef ALLOC
-  for (i = 0; i < HTTPD_MAX_CONN; i++)
-   {
-    if (httpd_conns[i] && httpd_conns[i]->conn
-      && (httpd_conns[i]->conn->state == ESPCONN_NONE || httpd_conns[i]->conn->state == ESPCONN_CLOSE))
-     {
-      os_timer_disarm(&httpd_conns[i]->timer);
-     }
-    if (httpd_conns[i])
-     {
-      INFO("free %d\n\r", i);
-      os_free((u8*)httpd_conns[i]);
-      httpd_conns[i] = NULL;
-     }
-   }
+  for (i = 0; i < HTTPD_MAX_CONN; i++) {
+    if (httpd_conns[i]) {
+      // Free ONLY slots whose espconn is closed or NULL
+      if (httpd_conns[i]->conn == NULL ||
+          httpd_conns[i]->conn->state == ESPCONN_NONE ||
+          httpd_conns[i]->conn->state == ESPCONN_CLOSE) {
+        os_timer_disarm(&httpd_conns[i]->timer);
+        INFO("free %d\n\r", i);
+        os_free((u8*)httpd_conns[i]);
+        httpd_conns[i] = NULL;
+      }
+    }
+  }
 #else
   for (i = 0; i < HTTPD_MAX_CONN; i++)
    {
@@ -426,13 +474,13 @@ static void ICACHE_FLASH_ATTR httpd_connect_callback(void *arg)
   os_timer_arm(&slot->timer, CONNECTION_TIMEOUT, 0);
  }
 
+static struct espconn httpdconn; // moved static to file scope for stop
+static esp_tcp httpdtcp;
+
 void ICACHE_FLASH_ATTR httpd_init(uint16_t port)
  {
 #ifdef ALLOC
   INFO("[HTTPD]Start server on port %d\n", port);
-
-  static struct espconn httpdconn;
-  static esp_tcp httpdtcp;
   unsigned int i;
 
   httpdconn.type = ESPCONN_TCP;
@@ -460,4 +508,34 @@ void ICACHE_FLASH_ATTR httpd_init(uint16_t port)
    }
 #endif
  }
+
+void ICACHE_FLASH_ATTR httpd_stop(void)
+{
+  // Close listener (espconn has no explicit close for passive accept; often disconnecting all slots enough)
+  unsigned int i;
+#ifdef ALLOC
+  for (i = 0; i < HTTPD_MAX_CONN; i++) {
+    if (httpd_conns[i]) {
+      if (httpd_conns[i]->conn) {
+        espconn_disconnect(httpd_conns[i]->conn);
+      }
+      os_timer_disarm(&httpd_conns[i]->timer);
+      os_free(httpd_conns[i]);
+      httpd_conns[i] = NULL;
+    }
+  }
+#else
+  for (i = 0; i < HTTPD_MAX_CONN; i++) {
+    if (httpd_conns[i].conn) {
+      espconn_disconnect(httpd_conns[i].conn);
+      httpd_conns[i].conn = NULL;
+    }
+    os_timer_disarm(&httpd_conns[i].timer);
+  }
+#endif
+  // Prevent new accepts by clearing callback (not strictly necessary before sleep)
+  httpdconn.proto.tcp = &httpdtcp; // ensure structure stable
+  // No direct API to unaccept; rely on mode change later.
+  INFO("[HTTPD]Stopped\n");
+}
 

@@ -1,0 +1,14 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.makefile-tools",
+        "ms-vscode.hexeditor",
+        "marus25.cortex-debug",
+        "platformio.platformio-ide",
+        "twxs.cmake",
+        "cschlosser.doxdocgen",
+        "adammaras.overtype",
+        "gruntfuggly.todo-tree"
+    ]
+}

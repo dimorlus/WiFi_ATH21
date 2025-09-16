@@ -1,0 +1,92 @@
+{
+	"ESP8266 Task Function": {
+		"prefix": "esp_task",
+		"body": [
+			"LOCAL void ICACHE_FLASH_ATTR",
+			"${1:task_name}(os_event_t *events)",
+			"{",
+			"\t${2:// Task implementation}",
+			"}"
+		],
+		"description": "ESP8266 Task Function Template"
+	},
+	"ESP8266 Timer Callback": {
+		"prefix": "esp_timer",
+		"body": [
+			"LOCAL void ICACHE_FLASH_ATTR",
+			"${1:timer_callback}(void *arg)",
+			"{",
+			"\t${2:// Timer callback implementation}",
+			"}"
+		],
+		"description": "ESP8266 Timer Callback Template"
+	},
+	"ESP8266 WiFi Event Handler": {
+		"prefix": "esp_wifi_event",
+		"body": [
+			"LOCAL void ICACHE_FLASH_ATTR",
+			"${1:wifi_event_handler}(System_Event_t *evt)",
+			"{",
+			"\tswitch(evt->event) {",
+			"\t\tcase EVENT_STAMODE_CONNECTED:",
+			"\t\t\t${2:// WiFi connected}",
+			"\t\t\tbreak;",
+			"\t\tcase EVENT_STAMODE_DISCONNECTED:",
+			"\t\t\t${3:// WiFi disconnected}",
+			"\t\t\tbreak;",
+			"\t\tcase EVENT_STAMODE_GOT_IP:",
+			"\t\t\t${4:// Got IP address}",
+			"\t\t\tbreak;",
+			"\t\tdefault:",
+			"\t\t\tbreak;",
+			"\t}",
+			"}"
+		],
+		"description": "ESP8266 WiFi Event Handler Template"
+	},
+	"MQTT Publish": {
+		"prefix": "mqtt_pub",
+		"body": [
+			"MQTT_Publish(&mqttClient, \"${1:topic}\", \"${2:message}\", ${3:strlen(message)}, ${4:0}, ${5:0});"
+		],
+		"description": "MQTT Publish Message"
+	},
+	"MQTT Subscribe": {
+		"prefix": "mqtt_sub", 
+		"body": [
+			"MQTT_Subscribe(&mqttClient, \"${1:topic}\", ${2:0});"
+		],
+		"description": "MQTT Subscribe to Topic"
+	},
+	"ESP8266 Debug Print": {
+		"prefix": "esp_debug",
+		"body": [
+			"#ifdef DEBUG_ON",
+			"os_printf(\"${1:Debug message}: %${2:s}\\r\\n\", ${3:variable});",
+			"#endif"
+		],
+		"description": "ESP8266 Debug Printf with conditional compilation"
+	},
+	"GPIO Setup": {
+		"prefix": "esp_gpio",
+		"body": [
+			"easygpio_pinMode(${1:pin_number}, EASYGPIO_NOPULL, ${2:EASYGPIO_OUTPUT});"
+		],
+		"description": "ESP8266 GPIO Pin Mode Setup"
+	},
+	"I2C Write": {
+		"prefix": "i2c_write",
+		"body": [
+			"i2c_start();",
+			"i2c_writeByte(${1:device_address});",
+			"if(!i2c_check_ack()) {",
+			"\ti2c_stop();",
+			"\treturn ${2:false};",
+			"}",
+			"i2c_writeByte(${3:data});", 
+			"i2c_check_ack();",
+			"i2c_stop();"
+		],
+		"description": "I2C Write Operation Template"
+	}
+}

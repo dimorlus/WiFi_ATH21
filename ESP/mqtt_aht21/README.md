@@ -1,267 +1,157 @@
-**esp_mqtt**
-==========
-This is MQTT client library for ESP8266, port from: [MQTT client library for Contiki](https://github.com/esar/contiki-mqtt) (thanks)
+# HUMT ESP8266 Device (MQTT Temperature & Humidity Node)
 
+Русская версия | [English version](./README.en.md)
 
+Это прошивка для узла на ESP8266 (NON-OS SDK 2.2.1) с датчиком AHT21B, публикацией температуры/влажности по MQTT и возможностями локальной конфигурации через Web и Telnet (порт 80 и 23). Основа — форк/адаптация библиотеки `esp_mqtt` (Tuan PM) + прикладная логика энергосбережения и настройки.
 
-**Features:**
+## Краткий обзор
 
- * Support subscribing, publishing, authentication, will messages, keep alive pings and all 3 QoS levels (it should be a fully functional client).
- * Support multiple connection (to multiple hosts).
- * Support SSL connection (max 1024 bit key size)
- * Easy to setup and use
+Устройство после старта:
 
-**Compile:**
+1. Загружает (или инициализирует) конфигурацию из flash.
+2. Подключается к Wi‑Fi (STA) и синхронизирует время через SNTP.
+3. Подключается к MQTT брокеру и публикует первичные статусы (alive/info, данные датчика).
+4. Ожидает подтверждение публикации и уходит в сон (deep или light) согласно параметрам сборки (`DEEP_SLEEP_MINUTES`, `LIGHT_SLEEP_SECONDS`).
 
-Make sure to add PYTHON PATH and compile PATH to Eclipse environment variable if using Eclipse
+## Основные возможности
 
-for Windows:
+* MQTT клиент: QoS1 публикации, подписки на сервисные топики, LWT.
+* Температура/Влажность/Точка росы с датчика AHT21B (битбанговый I2C).
+* OTA обновление по HTTP (GET бинарника `user1/user2.bin`) через MQTT команду (`/FOTA`).
+* Web-интерфейс конфигурации (изменение Wi‑Fi / MQTT / TZ / TLS уровня; заливка сертификатов и ключа).
+* Telnet setup (порт 23) — интерпретация простых команд (через `parse()`), удобна для скриптовой настройки.
+* SSL/TLS уровни (0..3) с загрузкой CA и client key/cert в flash.
+* Два режима сна: deep sleep (минимальное потребление, требует перемычку GPIO16→RST) и light sleep (RAM retention + рестарт после wake).
+* Watchdog логика таймеров и таймаут переподключения (перезапуск при длительной потере соединения).
+* Динамическая остановка HTTP/Telnet сервисов перед сном (опционально `SLEEP_STOP_SERVICES`).
 
-```bash
-git clone https://github.com/tuanpmt/esp_mqtt
-cd esp_mqtt
-#clean
-mingw32-make clean
-#make
-mingw32-make SDK_BASE="c:/Espressif/ESP8266_SDK" FLAVOR="release" all
-#flash
-mingw32-make ESPPORT="COM1" flash
-```
+## MQTT Топики
 
-for Mac or Linux:
+Формат базового префикса: `MQTT_TOPIC_BASE/MQTT_TOPIC_TYPE/DEV` и/или `MQTT_TOPIC_BASE/<MAC>/...`
 
-```bash
-git clone https://github.com/tuanpmt/esp_mqtt
-cd esp_mqtt
-#clean
-make clean
-#make
-make SDK_BASE="/opt/Espressif/ESP8266_SDK" FLAVOR="release" all
-#flash
-make ESPPORT="/dev/ttyUSB0" flash
-```
+| Суффикс | Макрос | Направление | Назначение |
+|---------|--------|-------------|-----------|
+| /alive  | TOPIC_ALIVE | Publish | Периодический статус устройства |
+| /lwt    | TOPIC_INIT  | LWT Publish | Last Will (offline) |
+| /ANS    | TOPIC_ANS   | Publish | Ответ на команду конфигурации (parse) |
+| /CFG    | TOPIC_CFG   | Subscribe | Запрос инфо / управление (16-бит маска / флаги) |
+| /SFG    | TOPIC_SFG   | Subscribe | Строковые команды/скрипты для `parse()` |
+| /INF    | TOPIC_INF   | Publish | Информационная сводка (Wi‑Fi, heap, версия) |
+| /FOTA   | TOPIC_FOTA  | Subscribe | URL для OTA обновления |
+| /TZD    | TOPIC_TZD   | Subscribe | Установка tzDiff (hex) |
+| /TZR    | TOPIC_TZR   | Publish | Текущая TZ строка |
+| /HUMT   | TOPIC_HUMT  | Publish | Пакет датчика: время, T, RH, Dew |
 
-**Usage**
-```c
-#include "ets_sys.h"
-#include "driver/uart.h"
-#include "osapi.h"
-#include "mqtt.h"
-#include "wifi.h"
-#include "config.h"
-#include "debug.h"
-#include "gpio.h"
-#include "user_interface.h"
-#include "mem.h"
+QoS: определяется `MQTT_QOS` (в проекте =1). Keepalive — `MQTT_KEEPALIVE` (120 c). Last Will — `/lwt`.
 
-MQTT_Client mqttClient;
+## Конфигурация (структура `SYSCFG`)
 
-void wifiConnectCb(uint8_t status)
-{
-	if(status == STATION_GOT_IP){
-		MQTT_Connect(&mqttClient);
-	} else {
-		MQTT_Disconnect(&mqttClient);
-	}
-}
-void mqttConnectedCb(uint32_t *args)
-{
-	MQTT_Client* client = (MQTT_Client*)args;
-	INFO("MQTT: Connected\r\n");
-	MQTT_Subscribe(client, "/mqtt/topic/0", 0);
-	MQTT_Subscribe(client, "/mqtt/topic/1", 1);
-	MQTT_Subscribe(client, "/mqtt/topic/2", 2);
+Flash-двойная буферизация (две области + флаг) по адресу `CFG_LOCATION`.
+Поля: `sta_ssid`, `sta_pwd`, `mqtt_host`, `mqtt_port`, `mqtt_topic_base`, `mqtt_user`, `mqtt_pass`, `node_name`, `node_place`, `TZ`, `mqtt_keepalive`, `security`, `utc`, `tzDiff`.
+Сброс к дефолту при несовпадении `CFG_HOLDER`.
 
-	MQTT_Publish(client, "/mqtt/topic/0", "hello0", 6, 0, 0);
-	MQTT_Publish(client, "/mqtt/topic/1", "hello1", 6, 1, 0);
-	MQTT_Publish(client, "/mqtt/topic/2", "hello2", 6, 2, 0);
+## OTA обновление
 
-}
+Через публикацию в топик `/FOTA` строки URL (варианты: `http://host/path/user1.bin`, `host/path/user1.bin`). Прошивка сама подменяет `user1/user2` в зависимости от текущего слота (`system_upgrade_userbin_check`). После успеха — перезапуск.
 
-void mqttDisconnectedCb(uint32_t *args)
-{
-	MQTT_Client* client = (MQTT_Client*)args;
-	INFO("MQTT: Disconnected\r\n");
-}
+## Web интерфейс (порт 80)
 
-void mqttPublishedCb(uint32_t *args)
-{
-	MQTT_Client* client = (MQTT_Client*)args;
-	INFO("MQTT: Published\r\n");
-}
+Главная `/`:
 
-void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const char *data, uint32_t data_len)
-{
-	char *topicBuf = (char*)os_zalloc(topic_len+1),
-			*dataBuf = (char*)os_zalloc(data_len+1);
+* Отображение версии, SDK, MAC (формат DEV ID), RSSI, heap.
+* Поля ввода: Type (node_name), Place, SSID, Password, TZ, Server, Port, TLS level, Topic base, User, Password.
+* Ссылки: `certu` (CA cert), `keyu` (private key), `reset`, `clear`.
+* POST форматы: либо `enctype='text/plain'` (по строкам), либо стандартный URL encoded (в коде предусмотрена обработка обоих вариантов).
 
-	MQTT_Client* client = (MQTT_Client*)args;
+Дополнительные эндпоинты:
 
-	os_memcpy(topicBuf, topic, topic_len);
-	topicBuf[topic_len] = 0;
+`/keyu` — форма загрузки приватного ключа (base64).
+`/certu` — форма загрузки CA cert (base64).
+`/clear` — сброс `cfg_holder` и сохранение (очистка настроек).
+`/id` — JSON идентификатор и capabilities.
+`/heap`, `/sdk`, `/ver`, `/reset`.
 
-	os_memcpy(dataBuf, data, data_len);
-	dataBuf[data_len] = 0;
+## Telnet setup (порт 23)
 
-	INFO("Receive topic: %s, data: %s \r\n", topicBuf, dataBuf);
-	os_free(topicBuf);
-	os_free(dataBuf);
-}
+Простой TCP сервер с одной сессией. При подключении переходит в режим Setup (`EnterSetup()`), при закрытии — `LeaveSetup()`, автоматически перезагружает конфигурацию. Каждая строка передаётся в `parse()`; ответ отправляется обратно. Используется для более низкоуровневой настройки или отладки без web.
 
+## Датчик AHT21B
 
-void user_init(void)
-{
-	uart_init(BIT_RATE_115200, BIT_RATE_115200);
-	os_delay_us(1000000);
+Битбанговый I2C (файлы `i2c.c/h`). Чтение 6 байт, расчёт RH/Temperature и вычисление точки росы (приближённый лог). Периодическое чтение вызывается в `PostData()` (каждые 10 минут по 1s таймеру) и при первичном подключении MQTT.
 
-	CFG_Load();
+## Режимы сна
 
-	MQTT_InitConnection(&mqttClient, sysCfg.mqtt_host, sysCfg.mqtt_port, sysCfg.security);
-	//MQTT_InitConnection(&mqttClient, "192.168.11.122", 1880, 0);
+Параметры в `user_main.c`:
 
-	MQTT_InitClient(&mqttClient, sysCfg.device_id, sysCfg.mqtt_user, sysCfg.mqtt_pass, sysCfg.mqtt_keepalive, 1);
-	//MQTT_InitClient(&mqttClient, "client_id", "user", "pass", 120, 1);
+* `DEEP_SLEEP_MINUTES` (>0) — после публикации уходит через `system_deep_sleep()` на указанные минуты (нужна перемычка GPIO16→RST). RF опция выставляется на `system_deep_sleep_set_option(1)`.
+* Если `DEEP_SLEEP_MINUTES == 0` и `LIGHT_SLEEP_SECONDS > 0` — используется упрощённый light sleep через FPM: отключение сервисов, `wifi_set_opmode(NULL_MODE)`, `wifi_fpm_do_sleep(us)`, затем `system_restart()` после wake.
+* Перед сном выключаются HTTP/Telnet (если `SLEEP_STOP_SERVICES`), MQTT disconnect, Wi‑Fi disconnect.
 
-	MQTT_InitLWT(&mqttClient, "/lwt", "offline", 0, 0);
-	MQTT_OnConnected(&mqttClient, mqttConnectedCb);
-	MQTT_OnDisconnected(&mqttClient, mqttDisconnectedCb);
-	MQTT_OnPublished(&mqttClient, mqttPublishedCb);
-	MQTT_OnData(&mqttClient, mqttDataCb);
+## Память и строки
 
-	WIFI_Connect(sysCfg.sta_ssid, sysCfg.sta_pwd, wifiConnectCb);
+Крупные HTML шаблоны (`index.c`) размещены во flash (`ICACHE_RODATA_ATTR STORE_ATTR`) и при необходимости копируются в RAM (функция `rom_cpy`). Избегается прямое побайтное чтение из flash для printf.
 
-	INFO("\r\nSystem started ...\r\n");
-}
+## Логи и отладка
 
-```
+Основной макрос `PRN` (os_printf). В ряде модулей можно включить подробный вывод раскомментированием `#define PRN os_printf`.
 
-**Publish message and Subscribe**
-
-```c
-/* TRUE if success */
-BOOL MQTT_Subscribe(MQTT_Client *client, char* topic, uint8_t qos);
-
-BOOL MQTT_Publish(MQTT_Client *client, const char* topic, const char* data, int data_length, int qos, int retain);
-
-```
-
-**Already support LWT: (Last Will and Testament)**
-
-```c
-
-/* Broker will publish a message with qos = 0, retain = 0, data = "offline" to topic "/lwt" if client don't send keepalive packet */
-MQTT_InitLWT(&mqttClient, "/lwt", "offline", 0, 0);
-
-```
-
-#Default configuration
-
-See: **include/user_config.h**
-
-If you want to load new default configurations, just change the value of CFG_HOLDER in **include/user_config.h**
-
-**Define protocol name in include/user_config.h**
-
-```c
-#define PROTOCOL_NAMEv31	/*MQTT version 3.1 compatible with Mosquitto v0.15*/
-//PROTOCOL_NAMEv311			/*MQTT version 3.11 compatible with https://eclipse.org/paho/clients/testing/*/
-```
-
-In the Makefile, it will erase section hold the user configuration at 0x3C000
+## Сборка и прошивка (Windows MinGW пример)
 
 ```bash
-flash: firmware/0x00000.bin firmware/0x40000.bin
-	$(PYTHON) $(ESPTOOL) -p $(ESPPORT) write_flash 0x00000 firmware/0x00000.bin 0x3C000 $(BLANKER) 0x40000 firmware/0x40000.bin 
-```
-The BLANKER is the blank.bin file you find in your SDKs bin folder.
-
-**Create SSL Self sign**
-
-```
-openssl req -x509 -newkey rsa:1024 -keyout key.pem -out cert.pem -days XXX
+mingw32-make -f Makefile all
+mingw32-make -f Makefile flash        # прошивка активного user bin
+mingw32-make -f Makefile fullflash    # полная прошивка (boot + app + init)
 ```
 
-**SSL Mqtt broker for test**
+Настройки путей к SDK задаются в Makefile / переменных окружения (пример в исходном проекте Tuan PM). Текущая прошивка использует карту flash SPI_FLASH_SIZE_MAP=2.
 
-```javascript
-var mosca = require('mosca')
-var SECURE_KEY = __dirname + '/key.pem';
-var SECURE_CERT = __dirname + '/cert.pem';
-var ascoltatore = {
-  //using ascoltatore
-  type: 'mongo',
-  url: 'mongodb://localhost:27017/mqtt',
-  pubsubCollection: 'ascoltatori',
-  mongo: {}
-};
+## Сертификаты TLS
 
-var moscaSettings = {
-  port: 1880,
-  stats: false,
-  backend: ascoltatore,
-  persistence: {
-    factory: mosca.persistence.Mongo,
-    url: 'mongodb://localhost:27017/mqtt'
-  },
-  secure : {
-    keyPath: SECURE_KEY,
-    certPath: SECURE_CERT,
-    port: 1883
-  }
-};
+Через web формы (`/certu`, `/keyu`). Данные (base64) конвертируются функцией `b642data()` и пишутся по секторам `CA_CERT_FLASH_ADDRESS`, `CLIENT_CERT_FLASH_ADDRESS`.
 
-var server = new mosca.Server(moscaSettings);
-server.on('ready', setup);
+## События MQTT / жизненный цикл
 
-server.on('clientConnected', function(client) {
-    console.log('client connected', client.id);
-});
+* `mqttConnectedCb`: подписка на сервисные топики, публикация alive/info, запуск таймера `_1s_timer`.
+* `mqttPublishedCb`: если установлен `PostFlag` (датчик опубликован) — инициирует переход в сон.
+* `mqttDataCb`: разбор команд (FOTA, TZD, SFG скрипты, CFG маски, OTA trigger).
 
-// fired when a message is received
-server.on('published', function(packet, client) {
-  console.log('Published', packet.payload);
-});
+## Ошибки и устойчивость
 
-// fired when the mqtt server is ready
-function setup() {
-  console.log('Mosca server is up and running')
-}
-```
+* Таймаут потери связи (`DISCONNECTED_TIMEOUT`) ведёт к `system_restart()`.
+* Отслеживание upgrade (`UpgradeRq` → OTA).
+* HTTP сервер защищён от переполнения буфера и неверного Content-Length.
 
-**Example projects using esp_mqtt:**<br/>
-- [https://github.com/eadf/esp_mqtt_lcd](https://github.com/eadf/esp_mqtt_lcd)
+## LED / GPIO
 
-**Limited:**<br/>
-- Not fully supported retransmit for QoS1 and QoS2
+* `RLED` (GPIO15) — мигание статуса (alive или активность в setup).
+* `KEY0` (GPIO0) — возможно задействован как кнопка (в коде проверяется для сброса/сохранения CFG при удержании > ~5 cек (500 * 10ms)).
+* I2C: GPIO4 (SCL), GPIO5 (SDA) настроены pull-up.
 
-**Status:** *Pre release.*
+## Быстрый старт
 
-[https://github.com/tuanpmt/esp_mqtt/releases](https://github.com/tuanpmt/esp_mqtt/releases)
-
-[MQTT Broker for test](https://github.com/mcollina/mosca)
-
-[MQTT Client for test](https://chrome.google.com/webstore/detail/mqttlens/hemojaaeigabkbcookmlgmdigohjobjm?hl=en)
-
-**Contributing:**
-
-***Feel free to contribute to the project in any way you like!***
-
-**Requried:**
-
-SDK esp_iot_sdk_v0.9.4_14_12_19 or higher
-
-**Authors:**
-[Tuan PM](https://twitter.com/TuanPMT)
-
-**Donations**
-
-Invite me to a coffee
-[![Donate](https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JR9RVLFC4GE6J)
+1. Настроить переменные в `include/mqtt_config.h` (или сменить `CFG_HOLDER` для сброса на дефолт).
+2. Собрать и прошить.
+3. Подключить UART @115200 для логов.
+4. Найти устройство по MQTT (топик `/alive` / `/INF`).
+5. Настроить через Web (http://DEVICE_IP/) или Telnet (порт 23).
+6. Проверить публикации `/HUMT`.
 
 
-**LICENSE - "MIT License"**
+## Потенциальные расширения
 
-Copyright (c) 2014-2015 Tuan PM, https://twitter.com/TuanPMT
+* Duty-cycle схема с периодическим включением для ещё меньшего среднего потребления.
+* Сжатие/минификация HTML или chunked выдача.
+* Расширенные диагностические топики (heap fragmentation, RSSI history).
+
+---
+
+## Legacy: Original esp_mqtt README
+
+Адаптировано из проекта Tuan PM `esp_mqtt`. Ниже — только лицензионное уведомление; оригинальное README сокращено для компактности.
+
+### MIT License (esp_mqtt)
+
+Copyright (c) 2014-2015 Tuan PM
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

@@ -1,0 +1,52 @@
+[
+    {
+        "key": "ctrl+shift+b",
+        "command": "workbench.action.tasks.runTask",
+        "args": "ESP8266: Build All"
+    },
+    {
+        "key": "ctrl+shift+f",
+        "command": "workbench.action.tasks.runTask", 
+        "args": "ESP8266: Flash"
+    },
+    {
+        "key": "ctrl+shift+r",
+        "command": "workbench.action.tasks.runTask",
+        "args": "ESP8266: Rebuild"
+    },
+    {
+        "key": "ctrl+shift+c",
+        "command": "workbench.action.tasks.runTask",
+        "args": "ESP8266: Clean"
+    },
+    {
+        "key": "ctrl+shift+m",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Serial Monitor (PuTTY)"
+    },
+    {
+        "key": "ctrl+alt+1",
+        "command": "workbench.action.tasks.runTask",
+        "args": "ESP8266: Build User1 (OTA)"
+    },
+    {
+        "key": "ctrl+alt+2", 
+        "command": "workbench.action.tasks.runTask",
+        "args": "ESP8266: Build User2 (OTA)"
+    },
+    {
+        "key": "ctrl+shift+alt+1",
+        "command": "workbench.action.tasks.runTask",
+        "args": "ESP8266: Flash User1"
+    },
+    {
+        "key": "ctrl+shift+alt+2",
+        "command": "workbench.action.tasks.runTask", 
+        "args": "ESP8266: Flash User2"
+    },
+    {
+        "key": "ctrl+alt+b",
+        "command": "workbench.action.tasks.runTask",
+        "args": "ESP8266: Build Release (bld.bat)"
+    }
+]

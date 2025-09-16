@@ -10,8 +10,8 @@
 //#include "debug.h"
 
 
-//#define INFO os_printf
-#define INFO
+#define INFO os_printf
+//#define INFO
 
 #define ROM_ALLOC
 
@@ -465,7 +465,7 @@ bool ICACHE_FLASH_ATTR index_httpd_request(struct HttpdConnectionSlot *slot,
       if (changed)
        {
         INFO("info changed. SAVE TO FLASH\r\n");
-        //CFG_Save();
+        CFG_Save();
         SaveCFG = true;
         if (strcasecmp(path, "/") == 0)
          {

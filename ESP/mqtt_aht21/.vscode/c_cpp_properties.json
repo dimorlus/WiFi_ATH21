@@ -1,0 +1,96 @@
+{
+    "configurations": [
+        {
+            "name": "ESP8266 (Current SDK)",
+            "includePath": [
+                "${workspaceFolder}",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/driver/include", 
+                "${workspaceFolder}/modules/include",
+                "${workspaceFolder}/mqtt/include",
+                "${workspaceFolder}/user/include",
+                "d:/ESP8266_NONOS_SDK/ESP8266_NONOS_SDK-2.2.1/include",
+                "d:/ESP8266_NONOS_SDK/ESP8266_NONOS_SDK-2.2.1/include/json",
+                "c:/Espressif/extra/include",
+                "c:/Espressif/xtensa-lx106-elf/xtensa-lx106-elf/include"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/include",
+                    "${workspaceFolder}/driver/include", 
+                    "${workspaceFolder}/modules/include",
+                    "${workspaceFolder}/mqtt/include",
+                    "${workspaceFolder}/user/include",
+                    "d:/ESP8266_NONOS_SDK/ESP8266_NONOS_SDK-2.2.1/include",
+                    "d:/ESP8266_NONOS_SDK/ESP8266_NONOS_SDK-2.2.1/include/json",
+                    "c:/Espressif/extra/include"
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": "${workspaceFolder}/.vscode/.browse.vc.db"
+            },
+            "defines": [
+                "_GNU_SOURCE",
+                "__XTENSA__", 
+                "__ets__",
+                "ICACHE_FLASH",
+                "ESP8266_NONOS_SDK",
+                "LWIP_OPEN_SRC",
+                "SPI_FLASH_SIZE_MAP=2",
+                "V2x",
+                "_APP_=0",
+                "_TRG_="
+            ],
+            "compilerPath": "c:/Espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc.exe",
+            "cStandard": "gnu89",
+            "cppStandard": "c++11", 
+            "intelliSenseMode": "gcc-x64",
+            "compilerArgs": [
+                "-Os",
+                "-g", 
+                "-O2",
+                "-std=gnu90",
+                "-Wpointer-arith",
+                "-Wundef",
+                "-Werror",
+                "-Wl,-EL",
+                "-fno-inline-functions",
+                "-nostdlib", 
+                "-mlongcalls",
+                "-mtext-section-literals",
+                "-mno-serialize-volatile"
+            ]
+        },
+        {
+            "name": "ESP8266 (Alternative SDK)",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/driver/include", 
+                "${workspaceFolder}/modules/include",
+                "${workspaceFolder}/mqtt/include",
+                "${workspaceFolder}/user/include",
+                "c:/Espressif/ESP8266_NONOS_SDK/include",
+                "c:/Espressif/ESP8266_SDK/include",
+                "c:/Espressif/extra/include",
+                "c:/Espressif/xtensa-lx106-elf/xtensa-lx106-elf/include"
+            ],
+            "defines": [
+                "_GNU_SOURCE",
+                "__XTENSA__", 
+                "__ets__",
+                "ICACHE_FLASH",
+                "ESP8266_NONOS_SDK",
+                "LWIP_OPEN_SRC",
+                "SPI_FLASH_SIZE_MAP=2",
+                "V2x",
+                "_APP_=0",
+                "_TRG_="
+            ],
+            "compilerPath": "c:/Espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc.exe",
+            "cStandard": "gnu89",
+            "cppStandard": "c++11", 
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

@@ -72,30 +72,31 @@ static void ICACHE_FLASH_ATTR wifi_check_ip(void *arg)
 }
 
 //---------------------------------------------------------------------------
-void ICACHE_FLASH_ATTR WIFI_Connect(uint8_t* ssid, uint8_t* pass, WifiCallback cb)
+void ICACHE_FLASH_ATTR WIFI_Connect (uint8_t *ssid, uint8_t *pass,
+									 WifiCallback cb)
 {
-	struct station_config stationConf;
+ struct station_config stationConf;
 
-  INFO("WIFI_INIT %s:%s\r\n", ssid, pass);
-  //wifi_set_opmode_current(STATION_MODE);
-  wifi_set_opmode_current(STATIONAP_MODE);
+ INFO("WIFI_INIT %s:%s\r\n", ssid, pass);
 
-	//wifi_station_set_auto_connect(FALSE);
-	wifiCb = cb;
+ wifi_set_opmode_current(STATIONAP_MODE);
 
-	os_memset(&stationConf, 0, sizeof(struct station_config));
+ //wifi_station_set_auto_connect(FALSE);
+ wifiCb = cb;
 
-	os_sprintf(stationConf.ssid, "%s", ssid);
-	os_sprintf(stationConf.password, "%s", pass);
+ os_memset(&stationConf, 0, sizeof(struct station_config));
 
-	wifi_station_set_config_current(&stationConf);
+ os_sprintf(stationConf.ssid, "%s", ssid);
+ os_sprintf(stationConf.password, "%s", pass);
 
-	os_timer_disarm(&WiFiLinker);
-	os_timer_setfn(&WiFiLinker, (os_timer_func_t *)wifi_check_ip, NULL);
-	os_timer_arm(&WiFiLinker, 1000, 0);
+ wifi_station_set_config_current(&stationConf);
 
-	//wifi_station_set_auto_connect(TRUE);
-	wifi_station_connect();
+ os_timer_disarm(&WiFiLinker);
+ os_timer_setfn(&WiFiLinker, (os_timer_func_t*) wifi_check_ip, NULL);
+ os_timer_arm(&WiFiLinker, 1000, 0);
+
+ //wifi_station_set_auto_connect(TRUE);
+ wifi_station_connect();
 }
 //---------------------------------------------------------------------------
 

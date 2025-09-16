@@ -1,0 +1,30 @@
+{
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c",
+        "Makefile": "makefile",
+        "*.mk": "makefile"
+    },
+    "files.exclude": {
+        "**/build/**": true,
+        "**/firmware/**": false,
+        "**/.git": true,
+        "**/desktop.ini": true
+    },
+    "search.exclude": {
+        "**/build": true,
+        "**/firmware": true
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cpptools",
+    "C_Cpp.default.compilerPath": "c:/Espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc.exe",
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false,
+    "editor.detectIndentation": false,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#1e3a8a",
+        "activityBar.foreground": "#ffffff"
+    }
+}

@@ -19,10 +19,7 @@
   (PartMRUSelector)
   (GlobalState
     (FileView
-      (Path "Design Resources")
-      (Path "Design Resources" ".\aht21.dsn")
-      (Path "Design Resources" ".\aht21.dsn" "AHT21")
-      (Select "Design Resources" ".\aht21.dsn" "AHT21" "AHT21"))
+      (Path "Design Resources"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
@@ -33,7 +30,7 @@
       (Type "COrSchematicDoc")
       (Frame
         (Placement "44 2 3 -1 -1 -9 -38 160 1792 160 804")
-        (Scroll "0 0")
+        (Scroll "0 20")
         (Zoom "170")
         (Occurrence "/"))
       (Path "D:\PROJECTS\LED\ALEX\WIFI_AHT21\SCHEMATIC\AHT21.DSN")

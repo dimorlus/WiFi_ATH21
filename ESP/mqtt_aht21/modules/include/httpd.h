@@ -22,6 +22,7 @@ void httpd_send_text(struct HttpdConnectionSlot *slot, uint16_t code, const char
 void httpd_send_html(struct HttpdConnectionSlot *slot, uint16_t code, const char *fmt, ...);
 
 void httpd_init(uint16_t port);
+void httpd_stop(void);
 void httpd_register(httpd_request_callback request_callback);
 
 #endif /* CONFIG_HTTPD_H_ */
