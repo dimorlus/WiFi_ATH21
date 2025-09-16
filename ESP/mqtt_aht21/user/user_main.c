@@ -67,7 +67,7 @@
 #define RESTART_TIME            60 //1min
 #define MAC_MASK                0x1FF  //Post data if masked SNTP equal masked MAC (0x1ff == 8m 31s)
 #define WCNT                    4
-
+#define SETUP_WINDOW			9*60 //9 minutes
 
 #define GW_BASE       //use gateway's MQTT base topic
 
@@ -130,15 +130,52 @@ bool UpgradeRq = false;
 bool inUpgrade = false;
 bool PostFlag = false;
 bool TSetup = false;
-u32 disconnected_time=0;
-u32 InfoFlag = 0;
+uint32_t disconnected_time=0;
+uint32_t InfoFlag = 0;
 char otaUrl[64];
 char str[400];
 char topic[64];
 char base_topic[48];
-u32 sn; //serial number
-u32 _1s = 0;
+uint32_t sn; //serial number
+uint32_t _1s = 0;
+uint32_t setup_window_1s = 0;
+// --- Setup window + sleep coordination ---
+// We also need to suppress the setup window after a programmed light-sleep restart.
+// Deep sleep wake is detectable via reset reason REASON_DEEP_SLEEP_AWAKE.
+// For light sleep we force a software restart, so we persist an RTC flag before sleeping.
+// RTC user memory: 512 bytes (offset 0..511) survive across deep-sleep / software restart (unless power off).
+// We'll reserve first 4 bytes for a magic flag.
+// MAGIC states:
+//   0x00000000 : no flag / normal boot -> allow setup window
+//   0xA17EE021 : next restart is returning from light sleep -> suppress window (set counter to SETUP_WINDOW)
+// After consuming the flag we clear it back to 0.
+#define RTC_LS_MAGIC 0xA17EE021
+typedef struct
+{
+ uint32 ls_magic;
+ uint32 reserved[127];
+} rtc_user_mem_t; // 128 * 4 = 512 bytes
+
+static bool ICACHE_FLASH_ATTR rtc_get_ls_magic(void)
+{
+ rtc_user_mem_t ram;
+ system_rtc_mem_read(64, &ram, sizeof(ram)); // 64 * 4 = offset 256 bytes (avoid clobbering SDK area 0-191)
+ return (ram.ls_magic == RTC_LS_MAGIC);
+}
+
+static void ICACHE_FLASH_ATTR rtc_set_ls_magic(bool set)
+{
+ rtc_user_mem_t ram;
+ system_rtc_mem_read(64, &ram, sizeof(ram));
+ ram.ls_magic = set ? RTC_LS_MAGIC : 0;
+ system_rtc_mem_write(64, &ram, sizeof(ram));
+}
 //---------------------------------------------------------------------------
+void setup_window_touch(void)
+{
+ setup_window_1s = 0;
+ PRN("Reset setup_window_1s %d\n", setup_window_1s);
+}
 //---------------------------------------------------------------------------
 //LOCAL void ICACHE_FLASH_ATTR dump(u8* data, int len)
 // {
@@ -151,12 +188,14 @@ void ICACHE_FLASH_ATTR EnterSetup(void)
  {
   TSetup = true;
   MQTT_Disconnect(&mqttClient);
+  setup_window_touch();
  }
 //---------------------------------------------------------------------------
 void ICACHE_FLASH_ATTR LeaveSetup(void)
  {
   TSetup = false;
   MQTT_Connect(&mqttClient);
+  setup_window_touch();
  }
 //---------------------------------------------------------------------------
 
@@ -260,6 +299,7 @@ void ICACHE_FLASH_ATTR PostData(void)
   PostFlag = true;
   int sz = os_strlen(str);
   MQTT_Publish(&mqttClient, topic, str, sz, MQTT_QOS, 0);
+  PRN("setup_window_1s %d\n", setup_window_1s);
  }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -274,31 +314,35 @@ bool ICACHE_FLASH_ATTR isTopic(const char *rtopic, const char *topic)
 //---------------------------------------------------------------------------
 #if DEEP_SLEEP_MINUTES > 0
 static ETSTimer sleep_timer;
-static void ICACHE_FLASH_ATTR enter_deepsleep_cb(void *arg)
+static void ICACHE_FLASH_ATTR enter_deepsleep_cb (void *arg)
 {
-  PRN("Entering deep sleep for %d min\r\n", DEEP_SLEEP_MINUTES);
+ PRN("Entering deep sleep for %d min\r\n", DEEP_SLEEP_MINUTES);
 #if SLEEP_STOP_SERVICES
-  // Отключаем возможные сервисы (AP / DHCP / HTTP) перед сном
-  uint8 op = wifi_get_opmode();
-  if (op & SOFTAP_MODE) {
-    wifi_softap_dhcps_stop();
-    // Сбросить в чистый режим перед NULL
-    wifi_set_opmode_current(STATION_MODE);
-  }
+ // Отключаем возможные сервисы (AP / DHCP / HTTP) перед сном
+
+ MQTT_Disconnect(&mqttClient);
+ httpd_stop();
+ tsetup_stop();
+ // Отключаем пользовательские таймеры
+ os_timer_disarm(&_1s_timer);
+ os_timer_disarm(&_10ms_timer);
+ wifi_station_dhcpc_stop();
+ wifi_station_disconnect();
+
 #endif
-  MQTT_Disconnect(&mqttClient);
-  wifi_station_disconnect();
-  // Ensure RF is off before deep sleep
-  wifi_set_opmode_current(NULL_MODE);
+ MQTT_Disconnect(&mqttClient);
+ wifi_station_disconnect();
+ // Ensure RF is off before deep sleep
+ wifi_set_opmode_current(NULL_MODE);
 
 #ifdef RLED
-    easygpio_outputSet(RLED, 0);
+ easygpio_outputSet(RLED, 0);
 #endif
 
-  // 0 = RF cal after wake, 1 = skip RF cal (faster, lower power), 2 = RF disabled
-  system_deep_sleep_set_option(1);
-  os_delay_us(20000); // 20 ms to let RF shut down cleanly
-  system_deep_sleep((uint64)DEEP_SLEEP_MINUTES * 60ULL * 1000000ULL);
+ // 0 = RF cal after wake, 1 = skip RF cal (faster, lower power), 2 = RF disabled
+ system_deep_sleep_set_option(1);
+ os_delay_us(20000); // 20 ms to let RF shut down cleanly
+ system_deep_sleep((uint64) DEEP_SLEEP_MINUTES * 60ULL * 1000000ULL);
 }
 #endif
 
@@ -334,6 +378,8 @@ static void ICACHE_FLASH_ATTR enter_lightsleep_sequence(void)
   wifi_fpm_set_sleep_type(LIGHT_SLEEP_T); // light sleep
   wifi_station_set_auto_connect(0);
 
+  // Mark upcoming restart so setup window is skipped on wake.
+  rtc_set_ls_magic(true);
   wifi_fpm_open();  // enable force sleep
 
   wifi_fpm_set_wakeup_cb(ls_wakeup_cb_simple);
@@ -374,6 +420,7 @@ LOCAL void ICACHE_FLASH_ATTR _1s_handler(void)
   static uint32_t RetryTime=0;
   _1s++;
 
+  setup_window_1s++;
   if (Connected||TSetup) disconnected_time = RetryTime = 0;
   else
    {
@@ -382,6 +429,7 @@ LOCAL void ICACHE_FLASH_ATTR _1s_handler(void)
       disconnected_time++;
       RetryTime++;
      }
+    else setup_window_touch();
    }
   if (UpgradeRq)
    {
@@ -623,24 +671,27 @@ void mqttDisconnectedCb(uint32_t *args)
 }
 //---------------------------------------------------------------------------
 
-void mqttPublishedCb(uint32_t *args)
+void mqttPublishedCb (uint32_t *args)
 {
- MQTT_Client* client = (MQTT_Client*)args;
+ MQTT_Client *client = (MQTT_Client*) args;
  INFO("MQTT: Published\r\n");
 
-  if (PostFlag)
-   {
-	PostFlag = false;
+ if (PostFlag)
+  {
+   PostFlag = false;
+   if (setup_window_1s >= SETUP_WINDOW)
+	{
 #if DEEP_SLEEP_MINUTES > 0
-  // Deep sleep после публикации
-  os_timer_disarm(&sleep_timer);
-  os_timer_setfn(&sleep_timer, (os_timer_func_t *)enter_deepsleep_cb, NULL);
-  os_timer_arm(&sleep_timer, 1000, 0);
+	 // Deep sleep после публикации
+	 os_timer_disarm(&sleep_timer);
+	 os_timer_setfn(&sleep_timer, (os_timer_func_t*) enter_deepsleep_cb, NULL);
+	 os_timer_arm(&sleep_timer, 1000, 0);
 #elif (DEEP_SLEEP_MINUTES == 0) && (LIGHT_SLEEP_SECONDS > 0)
   // Light sleep с перезапуском
   enter_lightsleep_sequence();
 #endif
-   }
+	}
+  }
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -662,6 +713,8 @@ void mqttDataCb(uint32_t *args, const char* rtopic, uint32_t topic_len, const ch
  dataBuf[data_len] = 0;
 
  PRN("Receive topic: %s, len: %d, data: %s \r\n", topicBuf, data_len, dataBuf);
+ // Any incoming MQTT data indicates active configuration/interaction -> refresh setup window.
+ //setup_window_touch();
 
  os_sprintf(topic, "%s" TOPIC_FOTA, base_topic);
  if (os_strcmp(topicBuf, topic)==0)
@@ -691,6 +744,7 @@ void mqttDataCb(uint32_t *args, const char* rtopic, uint32_t topic_len, const ch
    {
     //PRN("%s:%04X\r\n", topicBuf, wifi);
     PostInfo(wifi);
+    setup_window_touch();
    }
  }
 
@@ -704,6 +758,7 @@ void mqttDataCb(uint32_t *args, const char* rtopic, uint32_t topic_len, const ch
      PRN("Pub: %s:%s\n\r", topic, str);
      int sz = os_strlen(str);
      if (Connected) MQTT_Publish(&mqttClient, topic, str, sz, MQTT_QOS, 0);
+     setup_window_touch();
     }
  }
 
@@ -925,8 +980,33 @@ LOCAL void ICACHE_FLASH_ATTR wifi_event_cb(System_Event_t *event)
  }
 #endif
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+static bool ICACHE_FLASH_ATTR is_deep_sleep_wakeup (void)
+{
+ const struct rst_info *ri = system_get_rst_info();
+ return ri && ri->reason == REASON_DEEP_SLEEP_AWAKE;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
+static const char* ICACHE_FLASH_ATTR  rst_reason_str()
+{
+ const struct rst_info *ri = system_get_rst_info();
+ switch(ri->reason)
+  {
+   case REASON_DEFAULT_RST:      return "POWER_ON";
+   case REASON_WDT_RST:          return "HW_WDT";
+   case REASON_EXCEPTION_RST:    return "EXCEPTION";
+   case REASON_SOFT_WDT_RST:     return "SOFT_WDT";
+   case REASON_SOFT_RESTART:     return "SOFT_RESTART";
+   case REASON_DEEP_SLEEP_AWAKE: return "DEEP_SLEEP_WAKE";
+   case REASON_EXT_SYS_RST:      return "EXT_RESET";
+   default:                      return "UNKNOWN";
+  }
+}
 
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 void ICACHE_FLASH_ATTR user_init(void)
 {
@@ -950,12 +1030,25 @@ void ICACHE_FLASH_ATTR user_init(void)
   easygpio_pinMode(4, EASYGPIO_PULLUP, EASYGPIO_INPUT); //SCL
   easygpio_pinMode(5, EASYGPIO_PULLUP, EASYGPIO_INPUT); //SDA
 
+ // Suppress setup window if coming from deep sleep OR from a flagged light sleep restart.
+ if (is_deep_sleep_wakeup())
+  {
+   setup_window_1s = SETUP_WINDOW;
+  }
+ else if (rtc_get_ls_magic())
+  {
+   setup_window_1s = SETUP_WINDOW; // treat as continuation cycle
+   rtc_set_ls_magic(false); // consume the flag
+   PRN("Light-sleep restart detected -> skipping setup window\r\n");
+  }
+
   os_delay_us(60000); //60ms delay
   //system_update_cpu_freq(SYS_CPU_160MHZ);
   system_update_cpu_freq(SYS_CPU_80MHZ);
 
   PRN("\033[2J\033[H");
   PRN("App %d Version "_ver_"%d " __DATE__" "__TIME__"\r\n", _APP_, _build_);
+  PRN("Reset %s\n", rst_reason_str());
 
   i2c_init();
   //aht21b_init();

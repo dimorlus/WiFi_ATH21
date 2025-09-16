@@ -24,6 +24,9 @@
 #define KEEP_ALIVE_TIMEOUT  30000
 #define CONNECTION_TIMEOUT  3000
 
+
+extern void setup_window_touch(void);
+
 const char* verb_get = "GET";
 const char* verb_post = "POST";
 
@@ -352,6 +355,7 @@ static void ICACHE_FLASH_ATTR httpd_recv_callback(void *arg, char *pdata, unsign
    }
 
   INFO("[HTTPD]Data received\n");
+  setup_window_touch();
 
   uint16_t copy;
   while (len > 0 && slot->state != HTTPD_STATE_READY && slot->state != HTTPD_STATE_RESPONDING)
@@ -386,6 +390,7 @@ static void ICACHE_FLASH_ATTR httpd_timeout_callback(void *arg)
   slot->conn = NULL;
 
   INFO("[HTTPD]Timeout. Disconnect!\n");
+  setup_window_touch();
  }
 
 static void ICACHE_FLASH_ATTR httpd_sent_callback(void *arg)
@@ -411,6 +416,7 @@ static void ICACHE_FLASH_ATTR httpd_sent_callback(void *arg)
     slot->contentLen = 0;
 
     INFO("[HTTPD]Data sent!\n");
+    setup_window_touch();
    }
  }
 
@@ -444,6 +450,7 @@ static void ICACHE_FLASH_ATTR httpd_disconnect_callback(void *arg)
    }
 #endif
   INFO("[HTTPD]Disconnected!\n");
+  setup_window_touch();
  }
 
 static void ICACHE_FLASH_ATTR httpd_connect_callback(void *arg)
@@ -459,6 +466,7 @@ static void ICACHE_FLASH_ATTR httpd_connect_callback(void *arg)
    }
 
   INFO("[HTTPD]New connection\n");
+  setup_window_touch();
 
   slot->conn = conn;
   slot->bufferLen = 0;
