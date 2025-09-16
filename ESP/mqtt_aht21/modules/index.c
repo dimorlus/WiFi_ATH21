@@ -10,8 +10,8 @@
 //#include "debug.h"
 
 
-#define INFO os_printf
-//#define INFO
+//#define INFO os_printf
+#define INFO
 
 #define ROM_ALLOC
 

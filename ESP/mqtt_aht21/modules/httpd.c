@@ -7,8 +7,8 @@
 #include "httpd.h"
 #include "config.h"
 
-#define INFO os_printf
-//#define INFO
+//#define INFO os_printf
+#define INFO
 #define ALLOC //use dynamic memory allocation
 
 #define HTTPD_MAX_CONN          4
