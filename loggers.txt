@@ -1,0 +1,6 @@
+HT_3C71BF29A68E = "Vica office" 	10.0.1.192
+HT_3C71BF29A837 = "Lab"			10.0.1.177
+HT_3C71BF29AB79 = "Clean room"		10.0.1.175
+HT_3C71BF28FBD8 = "Dima office"		10.0.1.236
+HT_3C71BF29A89D = "Dima office2"	10.0.1.204
+HT_3C71BF29AA21 = "Dima office3" 	10.0.1.171

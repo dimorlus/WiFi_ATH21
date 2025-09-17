@@ -43,45 +43,53 @@ LOCAL void tcp_server_str(char *pbuf)
  �* Returns����� : none
  *******************************************************************************/
 LOCAL void ICACHE_FLASH_ATTR tcp_server_recv_cb(void *arg, char *pusrdata, unsigned short length)
- {
-  //received some data from tcp connection
+{
+  // received data from tcp connection
   uint32_t i;
   struct espconn *pespconn = arg;
 
-  //dump(pusrdata, length);
-  //PRN("tcp recv %d:\r\n", length);
+  // Ensure response buffer exists
+  if (!rstr) rstr = (char *)os_zalloc(RSTRLEN);
+  if (!rstr) return; // OOM safeguard
 
-  if (!rstr) rstr = (char *) os_zalloc(RSTRLEN);
+  if (tidx == 0) tstr[0] = '\0';
 
-  if (rstr)
-   {
-    if (tidx==0) tstr[0]='\0';
-    for(i = 0; i < length; i++)
-     {
-      char c = pusrdata[i];
-      //PRN("%c", c);
-  //#ifdef body
-      if (tidx < TSTRLEN-1)
-       {
-        if ((c == '\n') || (c >= ' ')) tstr[tidx++] = c;
+  bool should_send = false;
+  for (i = 0; i < length; i++)
+  {
+    char c = pusrdata[i];
+    // Like the original logic: end-of-line is LF only; CR is ignored.
+    if (c != '\n')
+    {
+      if (tidx < TSTRLEN - 1)
+      {
+        if (c >= ' ') tstr[tidx++] = c; // ignore control chars like CR
         tstr[tidx] = '\0';
-        if (c=='\n')
-         {
-          //PRN("'%s'\n", tstr);
-          parse(tstr, rstr, RSTRLEN);
-          espconn_sent(arg, rstr, os_strlen(rstr));
-          PRN("%s\n", rstr);
-          tidx = 0;
-          break;
-         }
-        //else
-        //if (c == '\b' && tidx) tidx--;
-       }
-      else tidx = 0;
-  //#endif
-     }
-   }
- }
+      }
+      else
+      {
+        // Overflow protection: reset the line to avoid drifting state
+        tidx = 0;
+        tstr[0] = '\0';
+      }
+    }
+
+    if (c == '\n')
+    {
+      // Complete current line and parse
+      tstr[tidx] = '\0';
+      PRN("%s\n", tstr);
+      parse(tstr, rstr, RSTRLEN);
+      PRN("%s\n", rstr);
+      tidx = 0; // reset for the next line in this same packet
+      should_send = true; // Defer sending until after processing all bytes of this packet
+    }
+  }
+  if (should_send)
+  {
+    espconn_sent(pespconn, rstr, os_strlen(rstr));
+  }
+}
 //---------------------------------------------------------------------------
 /******************************************************************************
  �* FunctionName : tcp_server_sent_cb

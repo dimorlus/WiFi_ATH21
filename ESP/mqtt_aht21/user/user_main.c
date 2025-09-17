@@ -421,6 +421,13 @@ LOCAL void ICACHE_FLASH_ATTR _1s_handler(void)
   _1s++;
 
   setup_window_1s++;
+  if (_1s%10 == 0)
+   {
+	PRN("setup_window_1s=%d\n", setup_window_1s);
+	PRN("disconnected_time=%d\n", disconnected_time);
+	PRN("RetryTime=%d\n", RetryTime);
+   }
+
   if (Connected||TSetup) disconnected_time = RetryTime = 0;
   else
    {
