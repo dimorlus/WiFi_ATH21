@@ -174,7 +174,7 @@ static void ICACHE_FLASH_ATTR rtc_set_ls_magic(bool set)
 void setup_window_touch(void)
 {
  setup_window_1s = 0;
- PRN("Reset setup_window_1s %d\n", setup_window_1s);
+ //PRN("Reset setup_window_1s %d\n", setup_window_1s);
 }
 //---------------------------------------------------------------------------
 //LOCAL void ICACHE_FLASH_ATTR dump(u8* data, int len)
@@ -187,14 +187,14 @@ void setup_window_touch(void)
 void ICACHE_FLASH_ATTR EnterSetup(void)
  {
   TSetup = true;
-  MQTT_Disconnect(&mqttClient);
+  //MQTT_Disconnect(&mqttClient);
   setup_window_touch();
  }
 //---------------------------------------------------------------------------
 void ICACHE_FLASH_ATTR LeaveSetup(void)
  {
   TSetup = false;
-  MQTT_Connect(&mqttClient);
+  //MQTT_Connect(&mqttClient);
   setup_window_touch();
  }
 //---------------------------------------------------------------------------
@@ -401,12 +401,18 @@ static void ICACHE_FLASH_ATTR enter_lightsleep_sequence(void)
 void ICACHE_FLASH_ATTR OTA(void)
  {
 #ifdef _OTA_
-  rx0_enable(false);
-  clear_uart0();
+//  rx0_enable(false);
+//  clear_uart0();
+//  MQTT_Disconnect(&mqttClient);
+//  httpd_stop();
+//  tsetup_stop();
+  // Отключаем пользовательские таймеры
+  os_timer_disarm(&_1s_timer);
   os_timer_disarm(&_10ms_timer);
+
   os_sprintf(str, "%s/user1.bin", otaUrl);
   PRN("OTA: %s\r\n", str);
-  MQTT_Disconnect(&mqttClient);
+//  MQTT_Disconnect(&mqttClient);
   start_ota(str);
 #endif
  }
@@ -421,12 +427,12 @@ LOCAL void ICACHE_FLASH_ATTR _1s_handler(void)
   _1s++;
 
   setup_window_1s++;
-  if (_1s%10 == 0)
-   {
-	PRN("setup_window_1s=%d\n", setup_window_1s);
-	PRN("disconnected_time=%d\n", disconnected_time);
-	PRN("RetryTime=%d\n", RetryTime);
-   }
+//  if (_1s%10 == 0)
+//   {
+//	PRN("setup_window_1s=%d\n", setup_window_1s);
+//	PRN("disconnected_time=%d\n", disconnected_time);
+//	PRN("RetryTime=%d\n", RetryTime);
+//   }
 
   if (Connected||TSetup) disconnected_time = RetryTime = 0;
   else

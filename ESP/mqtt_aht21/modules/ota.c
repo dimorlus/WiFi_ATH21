@@ -33,11 +33,18 @@ typedef struct {
 
 static os_timer_t ota_timer;
 static os_timer_t ota_restart_timer;
+static os_timer_t ota_reboot_timer;  // Отдельный таймер для reboot
 static ota_t ota_cdn;
-static ota_restart_flg;
+static uint8_t ota_restart_flg;
+static uint8_t ota_upgrade_success_flg;
 
 LOCAL void ICACHE_FLASH_ATTR ota_restart()
 {
+  // Простая проверка без лишних действий
+  if (ota_upgrade_success_flg) {
+    return; // Просто выходим, не делаем restart
+  }
+  
   if (ota_restart_flg == 0)
    {
     ota_restart_flg = 1;
@@ -71,7 +78,47 @@ LOCAL void ICACHE_FLASH_ATTR ota_response(void *arg)
   if(server->upgrade_flag == true)
    {
     INFO("OTA: Firmware upgrade success\n");
+    
+    // КРИТИЧЕСКИ ВАЖНО: устанавливаем флаг ДО всех других операций
+    ota_upgrade_success_flg = 1;
+    
+    INFO("OTA: *** NEW CODE VERSION - SETTING SUCCESS FLAG ***\n");
+    
+    // Отключаем watchdog немедленно
+    system_soft_wdt_stop();
+    
+    INFO("OTA: *** WATCHDOG STOPPED ***\n");
+    
+    // Останавливаем ВСЕ таймеры немедленно
+    os_timer_disarm(&ota_timer);
+    os_timer_disarm(&ota_restart_timer); 
+    os_timer_disarm(&ota_reboot_timer);
+    
+    INFO("OTA: *** ALL TIMERS DISARMED ***\n");
+    
+    // ВАЖНО: Вызываем system_upgrade_reboot() для переключения разделов
+    // но сразу после этого защищаемся от callback'ов
+    INFO("OTA: *** CALLING SYSTEM_UPGRADE_REBOOT FOR PARTITION SWITCH ***\n");
     system_upgrade_reboot();
+    
+    // Сразу после вызова даем системе время и защищаемся
+    INFO("OTA: *** WAITING 3 SECONDS AFTER REBOOT CALL ***\n");
+    
+    // Ждем дольше для корректного переключения разделов
+    int i;
+    for (i = 0; i < 3000; i++) {
+      os_delay_us(1000); // 1ms * 3000 = 3 секунды
+      if (i % 1000 == 0) {
+        INFO("OTA: Waiting... %d/3000\n", i);
+      }
+    }
+    
+    INFO("OTA: *** 3 SECONDS PASSED - SYSTEM SHOULD RESTART AUTOMATICALLY ***\n");
+    
+    // Если всё ещё работаем - бесконечное ожидание
+    while(1) {
+      os_delay_us(100000); // 100ms
+    }
    }
   else
    {
@@ -82,12 +129,14 @@ LOCAL void ICACHE_FLASH_ATTR ota_response(void *arg)
 
 LOCAL void ICACHE_FLASH_ATTR ota_recon_cb(void *arg, sint8 err)
 {
+  if (ota_upgrade_success_flg) return; // Первая строка - немедленный выход
   INFO("OTA: Firmware upgrade reconnect callback, error code %d\n", err);
   ota_restart();
 }
 
 LOCAL void ICACHE_FLASH_ATTR ota_discon_cb(void *arg)
 {
+  if (ota_upgrade_success_flg) return; // Первая строка - немедленный выход  
   INFO("OTA: Firmware client disconnect\n");
   ota_restart();
 }
@@ -187,6 +236,7 @@ void ICACHE_FLASH_ATTR start_ota(char *url)
   ota_t *ota_client = &ota_cdn;
 
   ota_restart_flg = 0;
+  ota_upgrade_success_flg = 0;  // Сбрасываем флаг успешного обновления
 
   os_memset(ota_client, '\0', sizeof(ota_t));
   str = strtok_r(url, "/", &p);     // http: or sidnas2:80 or sidnas2
