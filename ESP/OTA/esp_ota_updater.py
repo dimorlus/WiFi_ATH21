@@ -2,8 +2,32 @@
 """
 ESP8266 OTA Update Script
 Автоматизирует процесс OTA обновления прошивки ESP8266:
-1. Запускает HTTP сервер для раздачи файлов user1.bin/user2.bin
-2. Подключается к ESP через telnet и отправляет команды OTA и FOTA
+
+ОСНОВНЫЕ ВОЗМОЖНОСТИ:
+1. Автоматическое определение ESP устройств по IP адресу или имени
+2. Умный поиск устройств в сети (ARP таблица + сканирование подсети)
+3. Извлечение MAC адреса из имени устройства (формат HT_XXXXXXXXXXXX)
+4. HTTP сервер для раздачи файлов прошивки (user1.bin/user2.bin)
+5. Автоматическая отправка команд OTA и FOTA через telnet
+6. Подробная информация о файлах прошивки (размер, дата изменения)
+
+ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ:
+  python esp_ota_updater.py 10.0.1.166                    # По IP адресу
+  python esp_ota_updater.py HT_3C71BF29A3EC               # По имени устройства  
+  python esp_ota_updater.py HT_3C71BF29A3EC --http-port 8000  # Кастомный HTTP порт
+
+АЛГОРИТМ ПОИСКА УСТРОЙСТВ:
+1. Если передан IP - использует напрямую
+2. Если передано имя:
+   a) Проверяет ARP таблицу по имени
+   b) Извлекает MAC из имени (HT_XXXXXXXXXXXX -> xx-xx-xx-xx-xx-xx)
+   c) Ищет MAC в ARP таблице
+   d) Сканирует локальную подсеть (ping + hostname resolution)
+
+ТРЕБОВАНИЯ:
+- Python 3.6+
+- Стандартные утилиты Windows: arp, ping
+- ESP8266 с поддержкой telnet команд OTA/FOTA
 """
 
 import argparse
@@ -36,17 +60,41 @@ def is_ip_address(address):
     return all(0 <= int(part) <= 255 for part in parts)
 
 
+def extract_mac_from_hostname(hostname):
+    """Извлекает MAC адрес из имени устройства вида HT_3C71BF29A3EC"""
+    if '_' in hostname:
+        mac_part = hostname.split('_')[-1]  # Берем часть после последнего _
+        if len(mac_part) == 12:  # MAC без разделителей должен быть 12 символов
+            # Преобразуем 3C71BF29A3EC в 3c-71-bf-29-a3-ec
+            mac_formatted = '-'.join([mac_part[i:i+2].lower() for i in range(0, 12, 2)])
+            return mac_formatted
+    return None
+
+
 def check_arp_table(hostname):
-    """Проверяет ARP таблицу на наличие устройства с указанным именем"""
+    """Проверяет ARP таблицу на наличие устройства с указанным именем или MAC"""
     try:
         # Windows: arp -a
         result = subprocess.run(['arp', '-a'], capture_output=True, text=True, timeout=5)
+        
+        # Сначала пробуем найти по имени
         for line in result.stdout.split('\n'):
             if hostname.lower() in line.lower():
-                # Ищем IP в скобках или без них
                 ip_match = re.search(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', line)
                 if ip_match:
                     return ip_match.group(1)
+        
+        # Если не нашли по имени, пробуем извлечь MAC из имени и найти по MAC
+        expected_mac = extract_mac_from_hostname(hostname)
+        if expected_mac:
+            print(f"[MAC] Поиск по MAC адресу: {expected_mac}")
+            for line in result.stdout.split('\n'):
+                if expected_mac in line.lower():
+                    ip_match = re.search(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', line)
+                    if ip_match:
+                        print(f"[MAC] Найдено соответствие MAC -> IP: {ip_match.group(1)}")
+                        return ip_match.group(1)
+                        
     except Exception as e:
         print(f"[WARNING] Ошибка проверки ARP таблицы: {e}")
     return None
