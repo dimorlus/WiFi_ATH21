@@ -1,18 +1,28 @@
 cmake_minimum_required(VERSION 3.16)
-project(mqtt_logger LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# vcpkg must be configured before project()/enable_language():
+# CMake reads CMAKE_TOOLCHAIN_FILE only during the first project() call,
+# so setting it afterwards has no effect (it would only land in the cache).
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{VCPKG_ROOT})
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "vcpkg toolchain file")
+endif()
+
+# Default to the MinGW static triplet when building with MinGW.
+# Can be overridden with -DVCPKG_TARGET_TRIPLET=...
+if(NOT DEFINED VCPKG_TARGET_TRIPLET AND
+   (CMAKE_CXX_COMPILER MATCHES "mingw" OR CMAKE_GENERATOR MATCHES "MinGW"))
+  set(VCPKG_TARGET_TRIPLET "x64-mingw-static" CACHE STRING "vcpkg target triplet")
+endif()
 
 # prefer static linkage via vcpkg unless overridden
 if(NOT DEFINED VCPKG_LIBRARY_LINKAGE)
   set(VCPKG_LIBRARY_LINKAGE "static" CACHE STRING "vcpkg library linkage")
 endif()
 
-# If VCPKG_ROOT is set, use its toolchain automatically
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-endif()
+project(mqtt_logger LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Sources
 set(SOURCES

@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

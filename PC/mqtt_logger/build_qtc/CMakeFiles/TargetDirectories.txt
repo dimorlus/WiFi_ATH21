@@ -1,0 +1,3 @@
+D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build_qtc/CMakeFiles/mqtt_logger.dir
+D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build_qtc/CMakeFiles/edit_cache.dir
+D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build_qtc/CMakeFiles/rebuild_cache.dir

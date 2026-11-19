@@ -1,0 +1,7 @@
+# ninja log v7
+17	2040	8158497162414626	CMakeFiles/mqtt_logger.dir/src/config.cpp.obj	ba3d7dbaf3c82542
+20	2460	8158497162454623	CMakeFiles/mqtt_logger.dir/src/logger.cpp.obj	91872a7b68be31aa
+24	2503	8158497162484626	CMakeFiles/mqtt_logger.dir/src/replace_macros.cpp.obj	bc64756e6ee31ca5
+13	3033	8158497162379497	CMakeFiles/mqtt_logger.dir/src/main.cpp.obj	bdd689e9f65a648a
+3033	5012	8158497192577826	mqtt_logger.exe	f9550e54594d0615
+11	657	8158499848478338	mqtt_logger.exe	80b066585d66372e

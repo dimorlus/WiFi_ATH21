@@ -1,0 +1,40 @@
+d:\Projects\RAM\Freezer>ccalc fitpoly("code.csv",2)
+fitpoly("code.csv",2)
+                                     [( 1.425u, -20.54m,  -78.93)]
+
+
+d:\Projects\RAM\Freezer>ccalc fitpoly("code.csv",2)[0]
+fitpoly("code.csv",2)[0]
+                                            1.425394811314636e-06 f
+                                                           1.425u S
+                                                         1.425e-6 n
+                                                0000000000000000h
+                                                      NUL '\000'  c
+                                                               0s
+                                        Thu, Jan 01 00:00:00 1970
+   1.42539e-06 rad|0" (8.16691e-05`)|9.074e-05 gon|2.269e-07 turn
+
+
+d:\Projects\RAM\Freezer>ccalc fitpoly("code.csv",2)[1]
+fitpoly("code.csv",2)[1]
+                                             -0.02053541010875647 f
+                                                          -20.54m S
+                                                        -20.54e-3 n
+                                                0000000000000000h
+                                                      NUL '\000'  c
+                                                               0s
+                                        Thu, Jan 01 00:00:00 1970
+ -0.0205354 rad|-1`-10'-35" (-1.17659`)|-1.307 gon|-0.003268 turn
+
+
+d:\Projects\RAM\Freezer>ccalc fitpoly("code.csv",2)[2]
+fitpoly("code.csv",2)[2]
+                                               -78.93366580431337 f
+                                                           -78.93 S
+                                                           -78.93 n
+                                                ffffffffffffffb2h
+                                                             '▓'  c
+                          97423674:c 2090:y 228:d 18:h 58:m 58:s
+                                            Date overflow (>2038)
+    -78.9337 rad|-4522`-33'-56" (-4522.57`)|-5025 gon|-12.56 turn
+

@@ -1,0 +1,150 @@
+{
+	"configurations" : 
+	[
+		{
+			"abstractTargets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "OpenSSL::Crypto::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-OpenSSL__Crypto-Release-77d11c97f2ab91267218.json",
+					"name" : "OpenSSL::Crypto",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "OpenSSL::SSL::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-OpenSSL__SSL-Release-5a1ccf2cdfed5d5a6d1d.json",
+					"name" : "OpenSSL::SSL",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "OpenSSL::applink::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-OpenSSL__applink-Release-6bba34f0d6a5afa59e44.json",
+					"name" : "OpenSSL::applink",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "PahoMqttCpp::paho-mqttpp3-static::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-PahoMqttCpp__paho-mqttpp3-static-Release-043ac216abd0f1580220.json",
+					"name" : "PahoMqttCpp::paho-mqttpp3-static",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Threads::Threads::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Threads__Threads-Release-0970bfa53c879b40a6c4.json",
+					"name" : "Threads::Threads",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eclipse-paho-mqtt-c::paho-mqtt3a-static::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eclipse-paho-mqtt-c__paho-mqtt3a-static-Release-d533f6111f976a3c10fc.json",
+					"name" : "eclipse-paho-mqtt-c::paho-mqtt3a-static",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eclipse-paho-mqtt-c::paho-mqtt3as-static::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eclipse-paho-mqtt-c__paho-mqtt3as-static-Release-360ebc880271e48f9c22.json",
+					"name" : "eclipse-paho-mqtt-c::paho-mqtt3as-static",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eclipse-paho-mqtt-c::paho-mqtt3c-static::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eclipse-paho-mqtt-c__paho-mqtt3c-static-Release-449428db12bf8f5fb123.json",
+					"name" : "eclipse-paho-mqtt-c::paho-mqtt3c-static",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eclipse-paho-mqtt-c::paho-mqtt3cs-static::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eclipse-paho-mqtt-c__paho-mqtt3cs-static-Release-1b59ba9d95a38d73b8ef.json",
+					"name" : "eclipse-paho-mqtt-c::paho-mqtt3cs-static",
+					"projectIndex" : 0
+				}
+			],
+			"directories" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8
+					],
+					"build" : ".",
+					"jsonFile" : "directory-.-Release-f040eec181a89de70dbe.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "mqtt_logger",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "mqtt_logger::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-mqtt_logger-Release-ae8648ab6686a0246a0f.json",
+					"name" : "mqtt_logger",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger/build_qtc",
+		"source" : "D:/Projects/LED/Alex/WiFi_AHT21/PC/mqtt_logger"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	}
+}

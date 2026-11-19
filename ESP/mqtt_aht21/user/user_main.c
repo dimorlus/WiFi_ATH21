@@ -1,4 +1,4 @@
-//RFID
+//aht21
 /* main.c -- MQTT client example
 *
 * Copyright (c) 2014-2015, Tuan PM <tuanpm at live dot com>
@@ -28,6 +28,8 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 */
+//#define USE_ADS1115
+#define USE_AHT21
 
 #include "ets_sys.h"
 #include "osapi.h"
@@ -44,6 +46,7 @@
 #include "driver/easygpio.h"
 #include "driver/pwm.h"
 #include "driver/aht21b.h"
+#include "driver/ads1115.h"
 #include "httpd.h"
 #include "tsetup.h"
 
@@ -110,6 +113,16 @@ LOCAL os_timer_t _1s_timer;
 LOCAL uint8_t led_state=0;
 uint32_t _10ms = 0;
 uint32_t rx_10ms_timeout = 0;
+
+#ifdef USE_ADS1115
+LOCAL ads1115_t ads1115;
+LOCAL sint16 ads1115_filtered_raw = 0;
+LOCAL sint16 ads1115_raw = 0;
+LOCAL int32_t ads1115_filter_q8 = 0;
+LOCAL bool ads1115_filter_initialized = false;
+LOCAL bool ads1115_sample_valid = false;
+LOCAL bool ads1115_sampling_enabled = false;
+#endif
 
 typedef enum
 {
@@ -183,6 +196,155 @@ void setup_window_touch(void)
 //  PRN("\n\r");
 // }
 
+//---------------------------------------------------------------------------
+#ifdef USE_ADS1115
+
+void ICACHE_FLASH_ATTR ads1115_setup(void)
+{
+  ads1115_status_t status = ads1115_init(&ads1115, ADS1115_ADDRESS_GND);
+
+  if (status != ADS1115_STATUS_OK)
+  {
+    os_printf("ADS1115 init failed: %d\r\n", status);
+    return;
+  }
+
+  status = ads1115_start_continuous_channel(&ads1115, 0);
+  if (status != ADS1115_STATUS_OK)
+  {
+    os_printf("ADS1115 continuous mode start failed: %d\r\n", status);
+    return;
+  }
+
+  ads1115_set_pga(&ads1115, ADS1115_PGA_4_096V);
+  status = ads1115_start_continuous_channel(&ads1115, 0);
+  ads1115_sampling_enabled = true;
+}
+
+void ICACHE_FLASH_ATTR ads1115_sample_10ms(void)
+{
+  static bool error_logged = false;
+  sint16 raw;
+  ads1115_status_t status;
+
+  if (!ads1115_sampling_enabled)
+    return;
+
+  status = ads1115_read_conversion(&ads1115, &raw);
+  if (status != ADS1115_STATUS_OK)
+  {
+    ads1115_sample_valid = false;
+    if (!error_logged)
+    {
+      os_printf("ADS1115 sample failed: %d\r\n", status);
+      error_logged = true;
+    }
+    return;
+  }
+  
+  ads1115_raw = raw;
+
+  error_logged = false;
+  if (!ads1115_filter_initialized)
+  {
+    ads1115_filter_q8 = (int32_t)raw * 256;
+    ads1115_filter_initialized = true;
+  }
+  else
+  {
+    ads1115_filter_q8 += ((int32_t)raw * 256 - ads1115_filter_q8) / 8;
+  }
+
+  ads1115_filtered_raw = (sint16)(ads1115_filter_q8 / 256);
+  ads1115_sample_valid = true;
+}
+
+/**
+ * Calculate temperature from ADC value using a quadratic formula.
+ * @param adcValue The raw ADC value.
+ * @return The calculated temperature as a float.
+
+code.csv:
+15545,-54
+15651,-51
+15759,-49
+15864,-46
+15975,-44
+16032,-41
+16136,-39
+16237,-36
+16336,-34
+16435,-31
+16537,-29
+17463,-3
+18298,22
+19065,48
+
+d:\Projects\RAM\Freezer>ccalc fitpoly("code.csv",2)
+fitpoly("code.csv",2)
+                                     [( 1.425u, -20.54m,  -78.93)]
+
+
+d:\Projects\RAM\Freezer>ccalc fitpoly("code.csv",2)[0]
+fitpoly("code.csv",2)[0]
+                                            1.425394811314636e-06 f
+                                                           1.425u S
+                                                         1.425e-6 n
+                                                0000000000000000h
+                                                      NUL '\000'  c
+                                                               0s
+                                        Thu, Jan 01 00:00:00 1970
+   1.42539e-06 rad|0" (8.16691e-05`)|9.074e-05 gon|2.269e-07 turn
+
+
+d:\Projects\RAM\Freezer>ccalc fitpoly("code.csv",2)[1]
+fitpoly("code.csv",2)[1]
+                                             -0.02053541010875647 f
+                                                          -20.54m S
+                                                        -20.54e-3 n
+                                                0000000000000000h
+                                                      NUL '\000'  c
+                                                               0s
+                                        Thu, Jan 01 00:00:00 1970
+ -0.0205354 rad|-1`-10'-35" (-1.17659`)|-1.307 gon|-0.003268 turn
+
+
+d:\Projects\RAM\Freezer>ccalc fitpoly("code.csv",2)[2]
+fitpoly("code.csv",2)[2]
+                                               -78.93366580431337 f
+                                                           -78.93 S
+                                                           -78.93 n
+                                                ffffffffffffffb2h
+                                                             '▓'  c
+                          97423674:c 2090:y 228:d 18:h 58:m 58:s
+                                            Date overflow (>2038)
+    -78.9337 rad|-4522`-33'-56" (-4522.57`)|-5025 gon|-12.56 turn
+
+ */
+float ICACHE_FLASH_ATTR calculateTemperature(int adcValue)
+{
+  const double a = 1.42539e-6;
+  const double b = -0.02053541;
+  const double c = -78.9336658;
+
+  double x = (double)adcValue;
+  double temp = (a * x + b) * x + c;
+
+  return (float)temp;
+}
+
+void ICACHE_FLASH_ATTR fprn(char *s, float t)
+{
+  int tenths;
+  bool negative = t < 0.0f;
+
+  if (negative)
+    t = -t;
+  tenths = (int)(t * 10.0f + 0.5f);
+  os_sprintf(s, "%s%d.%d", negative ? "-" : "", tenths / 10, tenths % 10);
+}
+
+#endif
 //---------------------------------------------------------------------------
 void ICACHE_FLASH_ATTR EnterSetup(void)
  {
@@ -283,6 +445,8 @@ void ICACHE_FLASH_ATTR PostData(void)
 
   uint32_t time = sntp_get_current_timestamp();
 
+
+  #ifdef USE_AHT21B
   if (aht21b_read(&temp, &hum) == 0)
    {
 	float dew = aht21_get_dew_point(hum, temp);
@@ -293,7 +457,20 @@ void ICACHE_FLASH_ATTR PostData(void)
 	 (int)dew, (int)(dew*10)%10);
    }
   else os_sprintf(str, "%d, AHT21B read error", time);
+  #endif
 
+  #ifdef USE_ADS1115
+  if (ads1115_filtered_raw > 15000 && ads1115_filtered_raw < 20000)
+  {
+    static char tstr[16];
+    float temp = calculateTemperature(ads1115_filtered_raw);
+    fprn(tstr, temp);
+    os_sprintf(str, "SNTP: %d, TEMP: %s C, HUM: 0.0 %%, DEW: 0.0 C",
+               time, tstr);
+  }
+  else os_sprintf(str, "%d, ADS1115 read error", time);
+#endif
+  
   os_sprintf(topic, "%s" TOPIC_HUMT, base_topic);
   PRN("Pub: %s:%s\n\r", topic, str);
   PostFlag = true;
@@ -418,9 +595,6 @@ void ICACHE_FLASH_ATTR OTA(void)
  }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
 LOCAL void ICACHE_FLASH_ATTR _1s_handler(void)
 {
   static uint32_t RetryTime=0;
@@ -478,6 +652,13 @@ LOCAL void ICACHE_FLASH_ATTR _1s_timer_cb(void *arg)
 	if (_1s%600 == 0) PostData(); //10 minutes
    }
 
+  //  {
+  //   static char str[16];
+  //   float temp = calculateTemperature(ads1115_filtered_raw);
+  //   fprn(str, temp);
+  //   os_printf("ADC %d Temp %s\r\n", ads1115_filtered_raw, str);
+  //  }
+
   os_timer_arm(&_1s_timer, _1S_TIMER, 1);//1s start timer
   bsy = false;
  }
@@ -494,6 +675,10 @@ LOCAL void ICACHE_FLASH_ATTR _10ms_timer_cb(void *arg)
   system_soft_wdt_feed();
   if (inUpgrade) return;
   os_timer_disarm(&_10ms_timer); //stop timer
+
+  #ifdef USE_ADS1115
+  ads1115_sample_10ms();
+  #endif
 
   if (easygpio_inputGet(KEY0))
    {
@@ -1064,9 +1249,15 @@ void ICACHE_FLASH_ATTR user_init(void)
   PRN("Reset %s\n", rst_reason_str());
 
   i2c_init();
-  //aht21b_init();
+#ifdef USE_ADS1115
+  ads1115_setup();
+#endif
 
+
+#ifdef USE_AHT21
   aht21_init();
+#endif
+
   CFG_Load();
 
 

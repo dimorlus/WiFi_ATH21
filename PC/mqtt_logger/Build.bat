@@ -1,4 +1,3 @@
-@echo off
 setlocal
 
 if "%VCPKG_ROOT%"=="" set VCPKG_ROOT=C:\vcpkg

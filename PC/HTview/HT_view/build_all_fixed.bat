@@ -3,6 +3,11 @@ setlocal enabledelayedexpansion
 
 echo === HT View Complete Build and Package ===
 
+rem Инициализация окружения MSVC 2026 для корректной работы windeployqt
+if exist "C:\Program Files\Microsoft Visual Studio\18\Professional\VC\Auxiliary\Build\vcvars64.bat" (
+    call "C:\Program Files\Microsoft Visual Studio\18\Professional\VC\Auxiliary\Build\vcvars64.bat"
+)
+
 rem Найти правильную версию Qt
 set QT_DIR=
 if exist "C:\Qt\6.6.0\msvc2019_64\lib\cmake\Qt6" (
@@ -30,7 +35,9 @@ cd build
 
 rem 2. Настроить проект
 echo 2. Configuring project...
-cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_PREFIX_PATH=%QT_DIR% -DQt6_DIR=%Qt6_DIR%
+REM cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_PREFIX_PATH=%QT_DIR% -DQt6_DIR=%Qt6_DIR%
+cmake .. -G "Visual Studio 18 2026" -A x64 -DCMAKE_PREFIX_PATH=%QT_DIR% -DQt6_DIR=%Qt6_DIR%
+
 if errorlevel 1 (
     echo === ERROR ===
     echo CMake configuration failed!
